@@ -18,16 +18,18 @@ button:hover{background:#172554}
 .action{background:white;border-radius:10px;padding:10px;text-align:center;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.08);cursor:pointer}
 .action:hover{background:#eef2ff}
 ul{padding-left:18px}
+.pin-dots{font-size:24px;text-align:center;letter-spacing:10px}
+.success{background:#dcfce7;color:#166534;padding:10px;border-radius:8px;margin-top:10px;text-align:center}
 footer{text-align:center;font-size:13px;color:#666;margin-top:20px}
 </style>
 </head>
-<body><div class="header">Global Trust Bank</div><div class="container"><!-- LOGIN --><div id="login" class="card">
+<body><div class="header">Global Trust Bank</div><div class="container"><div id="login" class="card">
 <h3>Secure Login</h3>
 <input type="text" id="username" placeholder="Username">
 <input type="password" id="password" placeholder="Password">
 <button onclick="login()">Login</button>
 <p id="loginMsg"></p>
-</div><!-- DASHBOARD --><div id="dashboard" class="hidden"><div class="balanceCard">
+</div><div id="dashboard" class="hidden"><div class="balanceCard">
 <div>Ahmed Fauzi</div>
 <div style="font-size:13px;margin-top:4px">Savings Account • Global Trust Bank</div>
 <div class="balance" id="balance">$200,000</div>
@@ -43,7 +45,7 @@ footer{text-align:center;font-size:13px;color:#666;margin-top:20px}
 <input type="text" id="bank" placeholder="Receiver Bank">
 <input type="number" id="amount" placeholder="Amount">
 <button onclick="previewTransfer()">Send</button>
-<div id="transferPreview" class="hidden" style="margin-top:10px;background:#f1f5f9;padding:10px;border-radius:8px"></div>
+<div id="transferPreview" class="hidden"></div>
 </div><div id="depositBox" class="card hidden">
 <h4>Deposit Funds</h4>
 <input type="number" id="depositAmount" placeholder="Amount">
@@ -57,12 +59,12 @@ footer{text-align:center;font-size:13px;color:#666;margin-top:20px}
 <ul id="history"></ul>
 </div></div><footer>© 2026 Global Trust Bank</footer></div><script>
 let currentBalance = 200000;
+let savedPin = '2468';
 
 function login(){
 let user=document.getElementById('username').value;
 let pass=document.getElementById('password').value;
-
-if(user.length>0 && pass.length>0){
+if(user && pass){
 document.getElementById('login').classList.add('hidden');
 document.getElementById('dashboard').classList.remove('hidden');
 }else{
@@ -70,32 +72,10 @@ document.getElementById('loginMsg').innerText='Invalid login';
 }
 }
 
-function addHistory(text){
-let li=document.createElement('li');
-li.innerText=text;
-document.getElementById('history').appendChild(li);
-}
-
-function showTransfer(){
-closeAll();
-document.getElementById('transferBox').classList.remove('hidden');
-}
-
-function showDeposit(){
-closeAll();
-document.getElementById('depositBox').classList.remove('hidden');
-}
-
-function showWithdraw(){
-closeAll();
-document.getElementById('withdrawBox').classList.remove('hidden');
-}
-
-function closeAll(){
-['transferBox','depositBox','withdrawBox'].forEach(id=>{
-document.getElementById(id).classList.add('hidden');
-});
-}
+function showTransfer(){closeAll();document.getElementById('transferBox').classList.remove('hidden');}
+function showDeposit(){closeAll();document.getElementById('depositBox').classList.remove('hidden');}
+function showWithdraw(){closeAll();document.getElementById('withdrawBox').classList.remove('hidden');}
+function closeAll(){['transferBox','depositBox','withdrawBox'].forEach(id=>document.getElementById(id).classList.add('hidden'));}
 
 function previewTransfer(){
 let receiver=document.getElementById('receiver').value;
@@ -104,49 +84,54 @@ let bank=document.getElementById('bank').value;
 let amount=parseFloat(document.getElementById('amount').value);
 
 if(receiver && accountNum && bank && amount>0 && amount<=currentBalance){
-let preview='Receiver: '+receiver+'<br>Account No: '+accountNum+'<br>Bank: '+bank+'<br>Amount: $'+amount+'<br><br><button onclick="transfer()">Confirm Transfer</button>';
+let preview=`
+<div>
+<p><b>Receiver:</b> ${receiver}</p>
+<p><b>Account:</b> ${accountNum}</p>
+<p><b>Bank:</b> ${bank}</p>
+<p><b>Amount:</b> $${amount}</p>
+<div class='pin-dots' id='dots'>••••</div>
+<input type="password" id="pin" placeholder="Enter Transfer PIN">
+<button onclick="processTransfer(${amount},'${receiver}','${accountNum}','${bank}')">Confirm</button>
+</div>`;
 document.getElementById('transferPreview').innerHTML=preview;
 document.getElementById('transferPreview').classList.remove('hidden');
-}else{
-alert('Fill all fields correctly');
-}
+}else{alert('Fill all fields correctly');}
 }
 
-function transfer(){
-let receiver=document.getElementById('receiver').value;
-let accountNum=document.getElementById('accountNum').value;
-let bank=document.getElementById('bank').value;
-let amount=parseFloat(document.getElementById('amount').value);
+function processTransfer(amount,receiver,accountNum,bank){
+let enteredPin=document.getElementById('pin').value;
+if(enteredPin!==savedPin){alert('Incorrect PIN');return;}
 
-if(amount>0 && amount<=currentBalance){
+let processingMsg=document.createElement('div');
+processingMsg.innerText='Processing transaction...';
+document.getElementById('transferPreview').appendChild(processingMsg);
+
+setTimeout(()=>{
 currentBalance-=amount;
 document.getElementById('balance').innerText='$'+currentBalance.toLocaleString();
-addHistory('Transfer $'+amount+' to '+receiver+' | Acc: '+accountNum+' | '+bank);
-}else alert('Invalid amount');
+
+let success=document.createElement('div');
+success.className='success';
+success.innerText='Transfer Successful!';
+document.getElementById('transferPreview').appendChild(success);
+
+addHistory(`Transfer $${amount} to ${receiver} | Acc: ${accountNum} | ${bank}`);
+},1500);
 }
 
 function deposit(){
 let amount=parseFloat(document.getElementById('depositAmount').value);
-
-if(amount>0){
-currentBalance+=amount;
-document.getElementById('balance').innerText='$'+currentBalance.toLocaleString();
-addHistory('Deposit $'+amount);
-}else alert('Invalid amount');
+if(amount>0){currentBalance+=amount;document.getElementById('balance').innerText='$'+currentBalance.toLocaleString();addHistory('Deposit $'+amount);}else alert('Invalid amount');
 }
 
 function withdraw(){
 let amount=parseFloat(document.getElementById('withdrawAmount').value);
-
-if(amount>0 && amount<=currentBalance){
-currentBalance-=amount;
-document.getElementById('balance').innerText='$'+currentBalance.toLocaleString();
-addHistory('Withdraw $'+amount);
-}else alert('Invalid amount');
+if(amount>0 && amount<=currentBalance){currentBalance-=amount;document.getElementById('balance').innerText='$'+currentBalance.toLocaleString();addHistory('Withdraw $'+amount);}else alert('Invalid amount');
 }
 
-function logout(){
-location.reload();
-}
+function addHistory(text){let li=document.createElement('li');li.innerText=text;document.getElementById('history').appendChild(li);}
+
+function logout(){location.reload();}
 </script></body>
-  </html>
+</html>
