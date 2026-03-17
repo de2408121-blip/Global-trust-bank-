@@ -39,9 +39,11 @@ footer{text-align:center;font-size:13px;color:#666;margin-top:20px}
 </div><div id="transferBox" class="card hidden">
 <h4>Transfer Money</h4>
 <input type="text" id="receiver" placeholder="Receiver Name">
+<input type="text" id="accountNum" placeholder="Account Number">
 <input type="text" id="bank" placeholder="Receiver Bank">
 <input type="number" id="amount" placeholder="Amount">
-<button onclick="transfer()">Send</button>
+<button onclick="previewTransfer()">Send</button>
+<div id="transferPreview" class="hidden" style="margin-top:10px;background:#f1f5f9;padding:10px;border-radius:8px"></div>
 </div><div id="depositBox" class="card hidden">
 <h4>Deposit Funds</h4>
 <input type="number" id="depositAmount" placeholder="Amount">
@@ -95,15 +97,31 @@ document.getElementById(id).classList.add('hidden');
 });
 }
 
+function previewTransfer(){
+let receiver=document.getElementById('receiver').value;
+let accountNum=document.getElementById('accountNum').value;
+let bank=document.getElementById('bank').value;
+let amount=parseFloat(document.getElementById('amount').value);
+
+if(receiver && accountNum && bank && amount>0 && amount<=currentBalance){
+let preview='Receiver: '+receiver+'<br>Account No: '+accountNum+'<br>Bank: '+bank+'<br>Amount: $'+amount+'<br><br><button onclick="transfer()">Confirm Transfer</button>';
+document.getElementById('transferPreview').innerHTML=preview;
+document.getElementById('transferPreview').classList.remove('hidden');
+}else{
+alert('Fill all fields correctly');
+}
+}
+
 function transfer(){
 let receiver=document.getElementById('receiver').value;
+let accountNum=document.getElementById('accountNum').value;
 let bank=document.getElementById('bank').value;
 let amount=parseFloat(document.getElementById('amount').value);
 
 if(amount>0 && amount<=currentBalance){
 currentBalance-=amount;
 document.getElementById('balance').innerText='$'+currentBalance.toLocaleString();
-addHistory('Transfer $'+amount+' to '+receiver+' ('+bank+')');
+addHistory('Transfer $'+amount+' to '+receiver+' | Acc: '+accountNum+' | '+bank);
 }else alert('Invalid amount');
 }
 
@@ -131,4 +149,4 @@ function logout(){
 location.reload();
 }
 </script></body>
-</html>
+  </html>
