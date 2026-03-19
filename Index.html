@@ -98,7 +98,6 @@ footer{text-align:center;margin-top:20px;color:#666}
 <div class="balanceCard">
 <div>Ahmed Fauzi</div>
 <div id="accountType">Savings Account • Global Trust Bank</div>
-<!-- ✅ UPDATED BALANCE DISPLAY -->
 <div class="balance" id="balance">$5,000,000</div>
 </div>
 
@@ -171,19 +170,14 @@ const sendBtn = document.getElementById('sendBtn');
 const depositBtn = document.getElementById('depositBtn');
 const withdrawBtn = document.getElementById('withdrawBtn');
 
-/* ✅ UPDATED REAL BALANCE */
 let balance = 5000000;
-
 let pin = "2468";
 let currentLang = "en";
 
 const lang = {
 en:{login:'Secure Login',username:'Username',password:'Password',transfer:'Transfer',deposit:'Deposit',withdraw:'Withdraw',logout:'Logout',recent:'Recent Transactions',receiver:'Receiver Name',account:'Account Number',bank:'Bank',amount:'Amount',send:'Send',processing:'Processing...',done:'Transfer Successful',date:'Date',transaction:'Transaction ID',status:'Status',success:'SUCCESSFUL',savings:'Savings Account'},
-
 id:{login:'Masuk Aman',username:'Nama Pengguna',password:'Kata Sandi',transfer:'Transfer',deposit:'Setor',withdraw:'Tarik Tunai',logout:'Keluar',recent:'Transaksi Terbaru',receiver:'Nama Penerima',account:'Nomor Rekening',bank:'Bank',amount:'Jumlah',send:'Kirim',processing:'Memproses...',done:'Transfer Berhasil',date:'Tanggal',transaction:'ID Transaksi',status:'Status',success:'BERHASIL',savings:'Rekening Tabungan'},
-
 ms:{login:'Log Masuk',username:'Nama Pengguna',password:'Kata Laluan',transfer:'Pindahan',deposit:'Deposit',withdraw:'Pengeluaran',logout:'Keluar',recent:'Transaksi Terkini',receiver:'Nama Penerima',account:'Nombor Akaun',bank:'Bank',amount:'Jumlah',send:'Hantar',processing:'Memproses...',done:'Berjaya',date:'Tarikh',transaction:'ID Transaksi',status:'Status',success:'BERJAYA',savings:'Akaun Simpanan'},
-
 pt:{login:'Login Seguro',username:'Usuário',password:'Senha',transfer:'Transferir',deposit:'Depositar',withdraw:'Sacar',logout:'Sair',recent:'Transações Recentes',receiver:'Destinatário',account:'Conta',bank:'Banco',amount:'Valor',send:'Enviar',processing:'Processando...',done:'Transferência Concluída',date:'Data',transaction:'ID da Transação',status:'Status',success:'SUCESSO',savings:'Conta Poupança'}
 };
 
@@ -219,7 +213,15 @@ sendBtn.innerText = t.send;
 document.getElementById("accountType").innerText = t.savings + " • Global Trust Bank";
 }
 
+/* ✅ UPDATED LOGIN WITH PASSWORD CHECK */
 loginBtn.addEventListener("click", ()=>{
+let enteredPassword = document.getElementById("password").value;
+
+if(enteredPassword !== "444888"){
+alert("Incorrect password");
+return;
+}
+
 loginBox.style.display="none";
 dashboard.classList.remove("hidden");
 applyLang();
