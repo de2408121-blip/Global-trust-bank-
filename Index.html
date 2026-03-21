@@ -85,6 +85,7 @@ footer{text-align:center;margin-top:20px;color:#666}
 <option value="id">🇮🇩 Indonesia</option>
 <option value="ms">🇲🇾 Malaysia</option>
 <option value="pt">🇧🇷 Portuguese</option>
+<option value="th">🇹🇭 Thailand</option>
 </select>
 
 <input type="text" id="username" placeholder="Username">
@@ -178,7 +179,8 @@ const lang = {
 en:{login:'Secure Login',username:'Username',password:'Password',transfer:'Transfer',deposit:'Deposit',withdraw:'Withdraw',logout:'Logout',recent:'Recent Transactions',receiver:'Receiver Name',account:'Account Number',bank:'Bank',amount:'Amount',send:'Send',processing:'Processing...',done:'Transfer Successful',date:'Date',transaction:'Transaction ID',status:'Status',success:'SUCCESSFUL',savings:'Savings Account'},
 id:{login:'Masuk Aman',username:'Nama Pengguna',password:'Kata Sandi',transfer:'Transfer',deposit:'Setor',withdraw:'Tarik Tunai',logout:'Keluar',recent:'Transaksi Terbaru',receiver:'Nama Penerima',account:'Nomor Rekening',bank:'Bank',amount:'Jumlah',send:'Kirim',processing:'Memproses...',done:'Transfer Berhasil',date:'Tanggal',transaction:'ID Transaksi',status:'Status',success:'BERHASIL',savings:'Rekening Tabungan'},
 ms:{login:'Log Masuk',username:'Nama Pengguna',password:'Kata Laluan',transfer:'Pindahan',deposit:'Deposit',withdraw:'Pengeluaran',logout:'Keluar',recent:'Transaksi Terkini',receiver:'Nama Penerima',account:'Nombor Akaun',bank:'Bank',amount:'Jumlah',send:'Hantar',processing:'Memproses...',done:'Berjaya',date:'Tarikh',transaction:'ID Transaksi',status:'Status',success:'BERJAYA',savings:'Akaun Simpanan'},
-pt:{login:'Login Seguro',username:'Usuário',password:'Senha',transfer:'Transferir',deposit:'Depositar',withdraw:'Sacar',logout:'Sair',recent:'Transações Recentes',receiver:'Destinatário',account:'Conta',bank:'Banco',amount:'Valor',send:'Enviar',processing:'Processando...',done:'Transferência Concluída',date:'Data',transaction:'ID da Transação',status:'Status',success:'SUCESSO',savings:'Conta Poupança'}
+pt:{login:'Login Seguro',username:'Usuário',password:'Senha',transfer:'Transferir',deposit:'Depositar',withdraw:'Sacar',logout:'Sair',recent:'Transações Recentes',receiver:'Destinatário',account:'Conta',bank:'Banco',amount:'Valor',send:'Enviar',processing:'Processando...',done:'Transferência Concluída',date:'Data',transaction:'ID da Transação',status:'Status',success:'SUCESSO',savings:'Conta Poupança'},
+th:{login:'เข้าสู่ระบบอย่างปลอดภัย',username:'ชื่อผู้ใช้',password:'รหัสผ่าน',transfer:'โอนเงิน',deposit:'ฝากเงิน',withdraw:'ถอนเงิน',logout:'ออกจากระบบ',recent:'ธุรกรรมล่าสุด',receiver:'ชื่อผู้รับ',account:'หมายเลขบัญชี',bank:'ธนาคาร',amount:'จำนวนเงิน',send:'ส่ง',processing:'กำลังดำเนินการ...',done:'โอนเงินสำเร็จ',date:'วันที่',transaction:'รหัสธุรกรรม',status:'สถานะ',success:'สำเร็จ',savings:'บัญชีออมทรัพย์'}
 };
 
 function setLanguage(){
@@ -213,7 +215,7 @@ sendBtn.innerText = t.send;
 document.getElementById("accountType").innerText = t.savings + " • Global Trust Bank";
 }
 
-/* ✅ UPDATED LOGIN WITH PASSWORD CHECK */
+/* LOGIN */
 loginBtn.addEventListener("click", ()=>{
 let enteredPassword = document.getElementById("password").value;
 
