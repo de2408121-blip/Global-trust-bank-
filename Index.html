@@ -1,201 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Trust Bank</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Trust Bank | Wealth Portal</title>
+    <style>
+        :root { --primary: #6366f1; --dark-bg: #0f172a; --card-bg: #ffffff; --text-main: #1e293b; --success: #22c55e; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f1f5f9; color: var(--text-main); }
+        .header { background: var(--dark-bg); color: white; padding: 20px; text-align: center; font-size: 18px; font-weight: 600; border-bottom: 3px solid var(--primary); }
+        .container { max-width: 450px; margin: auto; padding: 20px; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-top: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+        input, select, button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 16px; outline: none; }
+        button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        
+        .balanceCard { background: linear-gradient(135deg, #1e293b, #334155); color: white; border-radius: 24px; padding: 25px; position: relative; }
+        .balance { font-size: 36px; font-weight: 800; }
+        .eye { position: absolute; right: 25px; top: 25px; cursor: pointer; }
 
-<style>
-body{font-family:Arial;margin:0;background:#eef2f7}
-.header{background:#0f172a;color:white;padding:18px;text-align:center;font-weight:bold;font-size:20px}
-.container{max-width:420px;margin:auto;padding:15px;padding-bottom:50px}
-.card{background:white;border-radius:15px;padding:18px;margin-top:15px;box-shadow:0 4px 10px rgba(0,0,0,0.08)}
-.hidden{display:none}
-input,select,button{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:1px solid #ccc;font-size:15px}
-button{background:#4f46e5;color:white;border:none;font-weight:bold}
-.balanceCard{background:linear-gradient(135deg,#4f46e5,#6366f1);color:white;border-radius:20px;padding:20px;position:relative}
-.eye{position:absolute;right:15px;top:15px;cursor:pointer;font-size:18px}
-.balance{font-size:32px;font-weight:bold;margin-top:5px}
-.actionsBox{background:linear-gradient(135deg,#4f46e5,#6366f1);padding:15px;border-radius:20px;margin-top:15px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.action{background:white;padding:12px;text-align:center;border-radius:12px;cursor:pointer;font-size:13px;font-weight:bold;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#4f46e5}
-.action img{display:block;margin:auto;margin-bottom:5px;width:24px;height:24px;}
-.success{background:#dcfce7;color:#166534;padding:10px;margin-top:10px;border-radius:8px;text-align:center}
-.receipt{border-radius:15px;padding:20px;background:linear-gradient(135deg,#1e3a8a,#4f46e5);color:white;font-family:'Courier New', monospace;line-height:1.5;box-shadow:0 8px 20px rgba(0,0,0,0.1);}
-.helpBtn{margin-top:10px;background:#25D366;border:none;color:white;border-radius:10px;padding:12px;font-weight:bold;cursor:pointer;width:100%;}
-</style>
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+        .action-icon { background: white; padding: 10px; border-radius: 15px; text-align: center; font-size: 11px; font-weight: 600; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .action-icon img { width: 24px; height: 24px; margin-bottom: 5px; }
+
+        /* UPGRADED RECEIPT CSS */
+        .receipt-container { background: white; border-radius: 15px; padding: 0; overflow: hidden; border: 1px solid #e2e8f0; }
+        .receipt-header { background: #f8fafc; padding: 20px; text-align: center; border-bottom: 1px dashed #cbd5e1; }
+        .receipt-body { padding: 20px; font-size: 14px; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+        .receipt-row span { color: #64748b; }
+        .receipt-row b { color: #0f172a; }
+        .success-badge { background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+
+        #history li { padding: 12px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 13px; }
+        .helpBtn { margin-top: 30px; background: #25D366; color: white; border-radius: 15px; padding: 15px; font-weight: bold; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div class="header">Global Trust Bank</div>
+<div class="header" id="mainHeader">GLOBAL TRUST BANK</div>
 
 <div class="container">
+    <div id="login" class="card">
+        <h3 id="loginTitle">Secure Portal Login</h3>
+        <select id="language" onchange="setLanguage()">
+            <option value="en" selected>🇺🇸 English</option>
+            <option value="id">🇮🇩 Indonesia</option>
+            <option value="ms">🇲🇾 Malaysia</option>
+            <option value="pt">🇧🇷 Portuguese</option>
+            <option value="th">🇹🇭 Thailand</option>
+        </select>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="loginBtn" onclick="doLogin()">Authorize Access</button>
+    </div>
 
-<!-- LOGIN -->
-<div id="login" class="card">
-<h3 id="loginTitle">Secure Login</h3>
-<select id="language" onchange="setLanguage()">
-<option selected disabled>Choose Language</option>
-<option value="en">🇺🇸 English</option>
-<option value="id">🇮🇩 Indonesia</option>
-<option value="ms">🇲🇾 Malaysia</option>
-<option value="pt">🇧🇷 Portuguese</option>
-<option value="th">🇹🇭 Thailand</option>
-</select>
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
-<button id="loginBtn">Login</button>
+    <div id="dashboard" class="hidden">
+        <div class="balanceCard">
+            <div class="userName" id="welcomeText">Welcome, Ahmed Fauzi</div>
+            <div id="accountType" class="accountInfo" style="font-size: 12px; opacity: 0.6;">Savings Account • 4402-****-9921</div>
+            <div class="balance" id="balance">$350,000.00</div>
+            <div class="eye" onclick="toggleBalance()">👁️</div>
+        </div>
+
+        <div class="grid">
+            <div class="action-icon" onclick="showBox('transferBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/forward-arrow.png"><span id="navTransfer">Transfer</span></div>
+            <div class="action-icon" onclick="showBox('depositBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/plus.png"><span id="navDeposit">Save</span></div>
+            <div class="action-icon" onclick="showBox('withdrawBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/minus.png"><span id="navWithdraw">Cash</span></div>
+            <div class="action-icon" onclick="location.reload()"><img src="https://img.icons8.com/ios-filled/50/4f46e5/shutdown.png"><span id="navExit">Exit</span></div>
+        </div>
+
+        <div id="transferBox" class="card hidden">
+            <h4 id="tTitle">Funds Transfer</h4>
+            <input id="receiver" placeholder="Beneficiary Name">
+            <input id="accountNum" placeholder="Account Number">
+            <input id="bank" placeholder="Bank">
+            <input id="amount" type="number" placeholder="Amount ($)">
+            <button onclick="preTransfer()" id="btnInitiate">Initiate Transfer</button>
+            <div id="transferPreview"></div>
+        </div>
+
+        <div id="receiptBox" class="card hidden" style="padding: 0; background: transparent; box-shadow: none;"></div>
+
+        <div class="card">
+            <h4 id="hTitle">Activity Log</h4>
+            <ul id="history"></ul>
+        </div>
+
+        <button class="helpBtn" onclick="window.open('https://wa.me/12792843484')">
+            <img src="https://img.icons8.com/color/24/ffffff/whatsapp.png"/> <span id="helpText">WhatsApp Support</span>
+        </button>
+    </div>
 </div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
-
-<div class="balanceCard">
-<div>Ahmed Fauzi</div>
-<div id="accountType">Savings Account • Global Trust Bank</div>
-<div class="balance" id="balance">$350,000</div>
-<div class="eye" onclick="toggleBalance()">👁️</div>
-</div>
-
-<div class="actionsBox">
-<div class="grid">
-<div class="action" id="btnTransfer">Transfer</div>
-<div class="action" id="btnDeposit">Deposit</div>
-<div class="action" id="btnWithdraw">Withdraw</div>
-<div class="action" id="btnLogout">Logout</div>
-</div>
-</div>
-
-<!-- EXTRA ACTIONS -->
-<div class="card" id="extraActions">
-  <div class="grid">
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/phone.png"/>Airtime</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/wifi.png"/>Data</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/dice.png"/>Bet</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/retro-tv.png"/>TV</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/shop.png"/>Biz Payment</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/electricity.png"/>Electricity</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/suitcase.png"/>Travel</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/hotel-bed.png"/>Hotel</div>
-    <div class="action"><img src="https://img.icons8.com/ios-filled/24/4f46e5/bus.png"/>Transport</div>
-  </div>
-</div>
-
-<!-- TRANSFER -->
-<div id="transferBox" class="card hidden">
-<h4 id="transferTitle">Transfer</h4>
-<input id="receiver" placeholder="Receiver Name">
-<input id="accountNum" placeholder="Account Number">
-<input id="bank" placeholder="Bank">
-<input id="amount" type="number" placeholder="Amount">
-<button id="sendBtn">Send</button>
-<div id="transferPreview"></div>
-</div>
-
-<!-- RECEIPT -->
-<div id="receiptBox" class="card hidden"></div>
-
-<!-- DEPOSIT -->
-<div id="depositBox" class="card hidden">
-<h4 id="depositTitle">Deposit</h4>
-<input id="depositAmount" type="number">
-<button id="depositBtn">Deposit</button>
-</div>
-
-<!-- WITHDRAW -->
-<div id="withdrawBox" class="card hidden">
-<h4 id="withdrawTitle">Withdraw</h4>
-<input id="withdrawAmount" type="number">
-<button id="withdrawBtn">Withdraw</button>
-</div>
-
-<!-- HISTORY -->
-<div class="card">
-<h4 id="recentTitle">Recent Transactions</h4>
-<ul id="history"></ul>
-</div>
-
-<button class="helpBtn" onclick="help()">💬 WhatsApp Help</button>
-
-</div>
-
-<footer>© 2026 Global Trust Bank</footer>
 
 <script>
-const loginBox=document.getElementById('login');
-const dashboard=document.getElementById('dashboard');
-const loginBtn=document.getElementById('loginBtn');
-const btnTransfer=document.getElementById('btnTransfer');
-const btnDeposit=document.getElementById('btnDeposit');
-const btnWithdraw=document.getElementById('btnWithdraw');
-const btnLogout=document.getElementById('btnLogout');
-const transferBox=document.getElementById('transferBox');
-const depositBox=document.getElementById('depositBox');
-const withdrawBox=document.getElementById('withdrawBox');
-const receiptBox=document.getElementById('receiptBox');
-const extraActions=document.getElementById('extraActions');
-const sendBtn=document.getElementById('sendBtn');
-const depositBtn=document.getElementById('depositBtn');
-const withdrawBtn=document.getElementById('withdrawBtn');
-let balance=350000;
-let pin="2468";
-let currentLang="en";
-let balanceHidden=false;
+    let balance = 350000;
+    let pin = "2468";
+    let balanceHidden = false;
 
-const lang={en:{login:'Secure Login',username:'Username',password:'Password',transfer:'Transfer',deposit:'Deposit',withdraw:'Withdraw',logout:'Logout',recent:'Recent Transactions',receiver:'Receiver Name',account:'Account Number',bank:'Bank',amount:'Amount',send:'Send',processing:'Processing...',done:'Transfer Successful',date:'Date',transaction:'Transaction ID',status:'Status',success:'SUCCESSFUL',savings:'Savings Account'},id:{login:'Masuk Aman',username:'Nama Pengguna',password:'Kata Sandi',transfer:'Transfer',deposit:'Setor',withdraw:'Tarik Tunai',logout:'Keluar',recent:'Transaksi Terbaru',receiver:'Nama Penerima',account:'Nomor Rekening',bank:'Bank',amount:'Jumlah',send:'Kirim',processing:'Memproses...',done:'Transfer Berhasil',date:'Tanggal',transaction:'ID Transaksi',status:'Status',success:'BERHASIL',savings:'Rekening Tabungan'},ms:{login:'Log Masuk',username:'Nama Pengguna',password:'Kata Laluan',transfer:'Pindahan',deposit:'Deposit',withdraw:'Pengeluaran',logout:'Keluar',recent:'Transaksi Terkini',receiver:'Nama Penerima',account:'Nombor Akaun',bank:'Bank',amount:'Jumlah',send:'Hantar',processing:'Memproses...',done:'Berjaya',date:'Tarikh',transaction:'ID Transaksi',status:'Status',success:'BERJAYA',savings:'Akaun Simpanan'},pt:{login:'Login Seguro',username:'Usuário',password:'Senha',transfer:'Transferir',deposit:'Depositar',withdraw:'Sacar',logout:'Sair',recent:'Transações Recentes',receiver:'Destinatário',account:'Conta',bank:'Banco',amount:'Valor',send:'Enviar',processing:'Processando...',done:'Transferência Concluída',date:'Data',transaction:'ID da Transação',status:'Status',success:'SUCESSO',savings:'Conta Poupança'},th:{login:'เข้าสู่ระบบอย่างปลอดภัย',username:'ชื่อผู้ใช้',password:'รหัสผ่าน',transfer:'โอนเงิน',deposit:'ฝากเงิน',withdraw:'ถอนเงิน',logout:'ออกจากระบบ',recent:'ธุรกรรมล่าสุด',receiver:'ชื่อผู้รับ',account:'หมายเลขบัญชี',bank:'ธนาคาร',amount:'จำนวนเงิน',send:'ส่ง',processing:'กำลังดำเนินการ...',done:'โอนเงินสำเร็จ',date:'วันที่',transaction:'รหัสธุรกรรม',status:'สถานะ',success:'สำเร็จ',savings:'บัญชีออมทรัพย์'}};
+    const langData = {
+        en: { head: "GLOBAL TRUST BANK", login: "Secure Portal Login", user: "Username", pass: "Access PIN", auth: "Authorize Access", welcome: "Welcome", savings: "Private Wealth Account", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Initiate Transfer", help: "WhatsApp Support", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", date: "Date", ref: "Reference ID" },
+        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Portal Aman", user: "ID Pengguna", pass: "PIN Akses", auth: "Otorisasi Akses", welcome: "Selamat Datang", savings: "Rekening Tabungan Pribadi", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Dukungan WhatsApp", status: "BERHASIL", receiptHead: "Resi Transaksi", date: "Tanggal", ref: "ID Referensi" },
+        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk Portal Selamat", user: "Nama Pengguna", pass: "PIN Akses", auth: "Sahkan Akses", welcome: "Selamat Datang", savings: "Akaun Simpanan Peribadi", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Sokongan WhatsApp", status: "BERJAYA", receiptHead: "Resit Transaksi", date: "Tarikh", ref: "ID Rujukan" },
+        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Login de Portal Seguro", user: "Usuário", pass: "PIN de Acesso", auth: "Autorizar Acesso", welcome: "Bem-vindo", savings: "Conta de Riqueza Privada", transfer: "Transferência", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir", help: "Suporte WhatsApp", status: "SUCESSO", receiptHead: "Recibo de Transação", date: "Data", ref: "Ref ID" },
+        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบพอร์ทัลที่ปลอดภัย", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "อนุญาตการเข้าถึง", welcome: "ยินดีต้อนรับ", savings: "บัญชีความมั่งคั่งส่วนบุคคล", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "เริ่มการโอน", help: "ฝ่ายสนับสนุน WhatsApp", status: "สำเร็จ", receiptHead: "ใบเสร็จรับเงิน", date: "วันที่", ref: "รหัสอ้างอิง" }
+    };
 
-function setLanguage(){currentLang=document.getElementById("language").value;applyLang();}
-function applyLang(){let t=lang[currentLang];document.getElementById("loginTitle").innerText=t.login;document.getElementById("username").placeholder=t.username;document.getElementById("password").placeholder=t.password;btnTransfer.innerText=t.transfer;btnDeposit.innerText=t.deposit;btnWithdraw.innerText=t.withdraw;btnLogout.innerText=t.logout;document.getElementById("transferTitle").innerText=t.transfer;document.getElementById("depositTitle").innerText=t.deposit;document.getElementById("withdrawTitle").innerText=t.withdraw;document.getElementById("recentTitle").innerText=t.recent;document.getElementById("receiver").placeholder=t.receiver;document.getElementById("accountNum").placeholder=t.account;document.getElementById("bank").placeholder=t.bank;document.getElementById("amount").placeholder=t.amount;sendBtn.innerText=t.send;document.getElementById("accountType").innerText=t.savings+" • Global Trust Bank";}
+    function setLanguage() {
+        const c = document.getElementById("language").value;
+        const d = langData[c];
+        document.getElementById("mainHeader").innerText = d.head;
+        document.getElementById("loginTitle").innerText = d.login;
+        document.getElementById("username").placeholder = d.user;
+        document.getElementById("password").placeholder = d.pass;
+        document.getElementById("loginBtn").innerText = d.auth;
+    }
 
-loginBtn.addEventListener("click",()=>{let enteredPassword=document.getElementById("password").value;if(enteredPassword!=="444222"){alert("Incorrect password");return;}loginBox.style.display="none";dashboard.classList.remove("hidden");applyLang();});
+    function doLogin() {
+        if(document.getElementById("password").value === "444222") {
+            document.getElementById("login").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
+            applyDashboardLang();
+            loadHistory();
+        } else { alert("Access Denied."); }
+    }
 
-function showBox(box){transferBox.classList.add("hidden");depositBox.classList.add("hidden");withdrawBox.classList.add("hidden");receiptBox.classList.add("hidden");box.classList.remove("hidden");extraActions.classList.add("hidden");}
-btnTransfer.onclick=()=>showBox(transferBox);btnDeposit.onclick=()=>showBox(depositBox);btnWithdraw.onclick=()=>showBox(withdrawBox);btnLogout.onclick=()=>location.reload();
-function toggleBalance(){balanceHidden=!balanceHidden;document.getElementById('balance').innerText=balanceHidden?"****":"$"+balance.toLocaleString();}
+    function applyDashboardLang() {
+        const c = document.getElementById("language").value;
+        const d = langData[c];
+        document.getElementById("welcomeText").innerText = d.welcome + ", Ahmed Fauzi";
+        document.getElementById("accountType").innerText = d.savings + " • 4402-****-9921";
+        document.getElementById("navTransfer").innerText = d.transfer;
+        document.getElementById("navDeposit").innerText = d.save;
+        document.getElementById("navWithdraw").innerText = d.cash;
+        document.getElementById("navExit").innerText = d.exit;
+        document.getElementById("tTitle").innerText = d.transfer;
+        document.getElementById("hTitle").innerText = d.history;
+        document.getElementById("receiver").placeholder = d.beneficiary;
+        document.getElementById("accountNum").placeholder = d.accNum;
+        document.getElementById("bank").placeholder = d.bank;
+        document.getElementById("amount").placeholder = d.amt;
+        document.getElementById("btnInitiate").innerText = d.initiate;
+        document.getElementById("helpText").innerText = d.help;
+    }
 
-sendBtn.onclick=()=>{let r=document.getElementById("receiver").value;let a=document.getElementById("accountNum").value;let b=document.getElementById("bank").value;let amt=parseFloat(document.getElementById("amount").value);document.getElementById("transferPreview").innerHTML=`<p>${r}</p><p>${a}</p><p>${b}</p><p>$${amt}</p><input type="password" id="pinInput" placeholder="Enter PIN"><button onclick="confirmTransfer(${amt},'${r}','${a}','${b}')">Confirm</button>`;}
+    function loadHistory() {
+        const list = document.getElementById("history");
+        list.innerHTML = "";
+        addHistoryItem("Bandung Central Hospital", 250000, "2026-04-20");
+        addHistoryItem("Dago Grand Mosque Charity", 150000, "2026-04-18");
+        addHistoryItem("West Java Orphanage Fund", 100000, "2026-04-15");
+        addHistoryItem("Germany Medical Relief NGO", 150000, "2026-04-10");
+    }
 
-function confirmTransfer(amt,r,a,b){let t=lang[currentLang];if(document.getElementById('pinInput').value!==pin){alert("Wrong PIN");return;}document.getElementById('transferPreview').innerHTML="<p>"+t.processing+"</p>";setTimeout(()=>{balance-=amt;updateBalance();addHistory(`$${amt} → ${r}`);generateReceipt(r,a,b,amt);document.getElementById('transferPreview').innerHTML="<div class='success'>"+t.done+"</div>";},1500);}
+    function addHistoryItem(to, amt, date) {
+        const list = document.getElementById("history");
+        const li = document.createElement("li");
+        li.innerHTML = `<div><small style="color:#94a3b8">${date}</small><br><strong>${to}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString()}</span>`;
+        list.prepend(li);
+    }
 
-// ✅ NEW PERFECT RECEIPT
-function generateReceipt(name,acc,bank,amt){
-let t=lang[currentLang];
-let id="GTB"+Math.floor(Math.random()*1000000);
-let date=new Date().toLocaleString();
-receiptBox.classList.remove("hidden");
-receiptBox.innerHTML=`
-<div id="receiptContent" style="
-  background:linear-gradient(135deg,#1e3a8a,#4f46e5);
-  border-radius:20px;
-  padding:20px;
-  color:white;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
-">
-  <div style="text-align:center;margin-bottom:15px;">
-    <h2 style="margin:0;">Global Trust Bank</h2>
-    <small style="opacity:0.8;">Transaction Receipt</small>
-  </div>
-  <div style="background:#22c55e;padding:10px;border-radius:10px;text-align:center;font-weight:bold;margin-bottom:15px;">✔ ${t.success}</div>
-  <div style="background:white;color:#111;border-radius:15px;padding:15px;">
-    <div style="display:flex;justify-content:space-between;padding:8px 0;"><span>${t.receiver}</span><b>${name}</b></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed #ddd;"><span>${t.account}</span><b>${acc}</b></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed #ddd;"><span>${t.bank}</span><b>${bank}</b></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed #ddd;"><span>${t.amount}</span><b style="color:#4f46e5;">$${amt}</b></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed #ddd;"><span>${t.date}</span><b>${date}</b></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed #ddd;"><span>${t.transaction}</span><b>${id}</b></div>
-  </div>
-  <div style="text-align:center;margin-top:15px;font-size:12px;opacity:0.9;">Thank you for banking with Global Trust Bank</div>
-</div>
-`;}
+    function showBox(id) {
+        document.getElementById("transferBox").classList.add("hidden");
+        document.getElementById("receiptBox").classList.add("hidden");
+        document.getElementById(id).classList.remove("hidden");
+    }
 
-// DEPOSIT / WITHDRAW
-depositBtn.onclick=()=>{let amt=parseFloat(document.getElementById("depositAmount").value);balance+=amt;updateBalance();addHistory("Deposit $"+amt);};
-withdrawBtn.onclick=()=>{let amt=parseFloat(document.getElementById("withdrawAmount").value);balance-=amt;updateBalance();addHistory("Withdraw $"+amt);};
+    function preTransfer() {
+        const r = document.getElementById("receiver").value;
+        const a = document.getElementById("amount").value;
+        if(!r || !a) return;
+        document.getElementById("transferPreview").innerHTML = `
+            <div class="card" style="margin-top:10px; background:#f8fafc">
+                <small>Confirm $${parseFloat(a).toLocaleString()} to ${r}</small>
+                <input type="password" id="tPin" placeholder="Transaction PIN">
+                <button onclick="finishTransfer(${a},'${r}')" style="background:#0f172a">Confirm</button>
+            </div>`;
+    }
 
-function updateBalance(){document.getElementById('balance').innerText=balanceHidden?"****":"$"+balance.toLocaleString();}
-function addHistory(text){let li=document.createElement("li");li.innerText=text;document.getElementById('history').appendChild(li);}
-function help(){window.open("https://wa.me/12792843484","_blank");}
+    function finishTransfer(amt, name) {
+        if(document.getElementById("tPin").value !== pin) { alert("Invalid PIN"); return; }
+        balance -= amt;
+        document.getElementById("balance").innerText = "$" + balance.toLocaleString();
+        addHistoryItem(name, amt, new Date().toISOString().split('T')[0]);
+        document.getElementById("transferBox").classList.add("hidden");
+        generateRealReceipt(name, amt);
+    }
+
+    // NEW REALISTIC RECEIPT GENERATOR
+    function generateRealReceipt(name, amt) {
+        const c = document.getElementById("language").value;
+        const d = langData[c];
+        const rBox = document.getElementById("receiptBox");
+        const accNum = document.getElementById("accountNum").value || "44021109921";
+        const bankName = document.getElementById("bank").value || "GTB Global";
+        const date = new Date().toLocaleString();
+        const refID = "GTB-" + Math.floor(Math.random()*100000000);
+
+        rBox.classList.remove("hidden");
+        rBox.innerHTML = `
+            <div class="receipt-container">
+                <div class="receipt-header">
+                    <img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px">
+                    <div style="font-weight:bold; font-size:16px;">GLOBAL TRUST BANK</div>
+                    <small>${d.receiptHead}</small>
+                </div>
+                <div class="receipt-body">
+                    <center>
+                        <div class="success-badge">✔ ${d.status}</div>
+                        <div style="font-size:24px; font-weight:800; color:#4f46e5; margin-bottom:20px;">$${amt.toLocaleString()}</div>
+                    </center>
+                    <div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div>
+                    <div class="receipt-row"><span>${d.accNum}</span><b>${accNum}</b></div>
+                    <div class="receipt-row"><span>${d.bank}</span><b>${bankName}</b></div>
+                    <div class="receipt-row"><span>${d.date}</span><b>${date}</b></div>
+                    <div class="receipt-row"><span>${d.ref}</span><b>${refID}</b></div>
+                    
+                    <button onclick="this.parentElement.parentElement.parentElement.classList.add('hidden')" 
+                            style="margin-top:20px; background:#f1f5f9; color:#475569; font-size:12px;">
+                        CLOSE RECEIPT
+                    </button>
+                </div>
+            </div>`;
+    }
+
+    function toggleBalance() {
+        balanceHidden = !balanceHidden;
+        document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
+    }
+
+    function showBox(id) {
+        document.getElementById("transferBox").classList.add("hidden");
+        document.getElementById("receiptBox").classList.add("hidden");
+        document.getElementById(id).classList.remove("hidden");
+    }
 </script>
 </body>
 </html>
