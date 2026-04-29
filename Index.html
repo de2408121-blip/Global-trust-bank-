@@ -32,7 +32,10 @@
         .success-badge { background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 
         #history li { padding: 12px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 13px; }
-        .helpBtn { margin-top: 30px; background: #25D366; color: white; border-radius: 15px; padding: 15px; font-weight: bold; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        
+        /* Help Center Styling */
+        .helpBtn { margin-top: 30px; background: var(--dark-bg); color: white; border-radius: 15px; padding: 15px; font-weight: 600; border: 1px solid #334155; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+        .helpBtn:hover { background: #1e293b; border-color: var(--primary); }
         
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -90,7 +93,7 @@
         </div>
 
         <button class="helpBtn" onclick="window.open('https://wa.me/12792843484')">
-            <img src="https://img.icons8.com/color/24/ffffff/whatsapp.png"/> <span id="helpText">WhatsApp Support</span>
+            <img src="https://img.icons8.com/ios-filled/24/ffffff/info.png"/> <span id="helpText">GTB Help Center</span>
         </button>
     </div>
 </div>
@@ -101,11 +104,11 @@
     let balanceHidden = false;
 
     const langData = {
-        en: { head: "GLOBAL TRUST BANK", login: "Secure Portal Login", user: "Username", pass: "Access PIN", auth: "Authorize Access", welcome: "Welcome", savings: "Private Wealth Account", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Initiate Transfer", help: "WhatsApp Support", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", date: "Date", ref: "Reference ID", verifying: "Verifying...", processing: "Processing...", confirm: "Confirm Transfer", close: "CLOSE RECEIPT" },
-        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Portal Aman", user: "ID Pengguna", pass: "PIN Akses", auth: "Otorisasi Akses", welcome: "Selamat Datang", savings: "Rekening Tabungan Pribadi", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Dukungan WhatsApp", status: "BERHASIL", receiptHead: "Resi Transaksi", date: "Tanggal", ref: "ID Referensi", verifying: "Memverifikasi...", processing: "Memproses...", confirm: "Konfirmasi Transfer", close: "TUTUP RESI" },
-        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk Portal Selamat", user: "Nama Pengguna", pass: "PIN Akses", auth: "Sahkan Akses", welcome: "Selamat Datang", savings: "Akaun Simpanan Peribadi", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Sokongan WhatsApp", status: "BERJAYA", receiptHead: "Resit Transaksi", date: "Tarikh", ref: "ID Rujukan", verifying: "Mengesahkan...", processing: "Memproses...", confirm: "Sahkan Pindahan", close: "TUTUP RESIT" },
-        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Login de Portal Seguro", user: "Usuário", pass: "PIN de Acesso", auth: "Autorizar Acesso", welcome: "Bem-vindo", savings: "Conta de Riqueza Privada", transfer: "Transferência", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir", help: "Suporte WhatsApp", status: "SUCESSO", receiptHead: "Recibo de Transação", date: "Data", ref: "Ref ID", verifying: "Verificando...", processing: "Processando...", confirm: "Confirmar Transferência", close: "FECHAR RECIBO" },
-        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบพอร์ทัลที่ปลอดภัย", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "อนุญาตการเข้าถึง", welcome: "ยินดีต้อนรับ", savings: "บัญชีความมั่งคั่งส่วนบุคคล", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "เริ่มการโอน", help: "ฝ่ายสนับสนุน WhatsApp", status: "สำเร็จ", receiptHead: "ใบเสร็จรับเงิน", date: "วันที่", ref: "รหัสอ้างอิง", verifying: "กำลังตรวจสอบ...", processing: "กำลังดำเนินการ...", confirm: "ยืนยันการโอน", close: "ปิดใบเสร็จ" }
+        en: { head: "GLOBAL TRUST BANK", login: "Secure Portal Login", user: "Username", pass: "Access PIN", auth: "Authorize Access", welcome: "Welcome", savings: "Private Wealth Account", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Initiate Transfer", help: "GTB Help Center", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", date: "Date", ref: "Reference ID", verifying: "Verifying Identity...", processing: "Processing...", confirm: "Confirm Transfer", close: "CLOSE RECEIPT" },
+        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Portal Aman", user: "ID Pengguna", pass: "PIN Akses", auth: "Otorisasi Akses", welcome: "Selamat Datang", savings: "Rekening Tabungan Pribadi", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Pusat Bantuan GTB", status: "BERHASIL", receiptHead: "Resi Transaksi", date: "Tanggal", ref: "ID Referensi", verifying: "Memverifikasi Identitas...", processing: "Memproses...", confirm: "Konfirmasi Transfer", close: "TUTUP RESI" },
+        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk Portal Selamat", user: "Nama Pengguna", pass: "PIN Akses", auth: "Sahkan Akses", welcome: "Selamat Datang", savings: "Akaun Simpanan Peribadi", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", date: "Tarikh", ref: "ID Rujukan", verifying: "Mengesahkan Identiti...", processing: "Memproses...", confirm: "Sahkan Pindahan", close: "TUTUP RESIT" },
+        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Login de Portal Seguro", user: "Usuário", pass: "PIN de Acesso", auth: "Autorizar Acesso", welcome: "Bem-vindo", savings: "Conta de Riqueza Privada", transfer: "Transferência", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir", help: "Centro de Ajuda GTB", status: "SUCESSO", receiptHead: "Recibo de Transação", date: "Data", ref: "Ref ID", verifying: "Verificando Identidade...", processing: "Processando...", confirm: "Confirmar Transferência", close: "FECHAR RECIBO" },
+        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบพอร์ทัลที่ปลอดภัย", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "อนุญาตการเข้าถึง", welcome: "ยินดีต้อนรับ", savings: "บัญชีความมั่งคั่งส่วนบุคคล", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "เริ่มการโอน", help: "ศูนย์ช่วยเหลือ GTB", status: "สำเร็จ", receiptHead: "ใบเสร็จรับเงิน", date: "วันที่", ref: "รหัสอ้างอิง", verifying: "กำลังตรวจสอบตัวตน...", processing: "กำลังดำเนินการ...", confirm: "ยืนยันการโอน", close: "ปิดใบเสร็จ" }
     };
 
     function setLanguage() {
@@ -204,7 +207,6 @@
             return; 
         }
 
-        // Show Processing State on the button
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = `<span class="loader"></span> ${d.processing}`;
         
@@ -214,7 +216,7 @@
             addHistoryItem(name, amt, new Date().toISOString().split('T')[0]);
             document.getElementById("transferBox").classList.add("hidden");
             generateRealReceipt(name, amt);
-        }, 3000); // 3-second bank-style processing delay
+        }, 3000); 
     }
 
     function generateRealReceipt(name, amt) {
