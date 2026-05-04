@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Trust Bank | Wealth Portal</title>
+    <title>Global Trust Bank | Private Wealth</title>
     <style>
         :root { --primary: #6366f1; --dark-bg: #0f172a; --card-bg: #ffffff; --text-main: #1e293b; --success: #22c55e; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f1f5f9; color: var(--text-main); }
@@ -11,32 +11,38 @@
         .container { max-width: 450px; margin: auto; padding: 20px; }
         .card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-top: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
         .hidden { display: none; }
-        input, select, button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 16px; outline: none; transition: 0.3s; }
+
+        .login-brand { text-align: center; margin-bottom: 20px; }
+        .login-brand img { width: 45px; margin-bottom: 10px; }
+        .security-banner { background: #f0f4ff; border-left: 4px solid var(--primary); padding: 12px; border-radius: 8px; font-size: 11px; color: #1e293b; margin-bottom: 20px; line-height: 1.4; }
+        .security-banner b { display: block; color: var(--primary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input, select, button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 16px; outline: none; transition: 0.3s; box-sizing: border-box; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; }
         button:disabled { background: #94a3b8; cursor: not-allowed; }
         
         .balanceCard { background: linear-gradient(135deg, #1e293b, #334155); color: white; border-radius: 24px; padding: 25px; position: relative; }
         .balance { font-size: 36px; font-weight: 800; }
-        .eye { position: absolute; right: 25px; top: 25px; cursor: pointer; }
+        .eye { position: absolute; right: 25px; top: 25px; cursor: pointer; font-size: 20px; user-select: none; }
 
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
         .action-icon { background: white; padding: 10px; border-radius: 15px; text-align: center; font-size: 11px; font-weight: 600; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .action-icon img { width: 24px; height: 24px; margin-bottom: 5px; }
 
-        .receipt-container { background: white; border-radius: 15px; padding: 0; overflow: hidden; border: 1px solid #e2e8f0; }
-        .receipt-header { background: #f8fafc; padding: 20px; text-align: center; border-bottom: 1px dashed #cbd5e1; }
-        .receipt-body { padding: 20px; font-size: 14px; }
-        .receipt-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-        .receipt-row span { color: #64748b; }
-        .receipt-row b { color: #0f172a; }
-        .success-badge { background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
-
+        #history { list-style: none; padding: 0; }
         #history li { padding: 12px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 13px; }
         
-        /* Help Center Styling */
-        .helpBtn { margin-top: 30px; background: var(--dark-bg); color: white; border-radius: 15px; padding: 15px; font-weight: 600; border: 1px solid #334155; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.2s; }
-        .helpBtn:hover { background: #1e293b; border-color: var(--primary); }
-        
+        .receipt-container { background: white; border-radius: 15px; padding: 0; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .receipt-header { background: #f8fafc; padding: 25px; text-align: center; border-bottom: 1px dashed #cbd5e1; }
+        .receipt-body { padding: 25px; font-size: 14px; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f8fafc; }
+        .receipt-row span { color: #64748b; font-weight: 500; }
+        .receipt-row b { color: #0f172a; text-align: right; }
+        .success-badge { background: #dcfce7; color: #166534; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; border: 1px solid #bbf7d0; }
+        .receipt-footer { padding: 15px; background: #f8fafc; color: #94a3b8; font-size: 10px; text-align: center; line-height: 1.4; border-top: 1px solid #f1f5f9; }
+
+        .helpBtn { margin-top: 30px; background: var(--dark-bg); color: white; border-radius: 15px; padding: 15px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -47,25 +53,29 @@
 
 <div class="container">
     <div id="login" class="card">
-        <h3 id="loginTitle">Secure Portal Login</h3>
+        <div class="login-brand">
+            <img src="https://img.icons8.com/ios-filled/100/4f46e5/bank.png" alt="Logo">
+            <h3 id="loginTitle" style="margin:0; font-size: 24px; color: #0f172a;">Sign In</h3>
+        </div>
+        <div id="securityBanner" class="security-banner"></div>
         <select id="language" onchange="setLanguage()">
-            <option value="en" selected>🇺🇸 English</option>
+            <option value="en" selected>🇺🇸 United States</option>
             <option value="id">🇮🇩 Indonesia</option>
             <option value="ms">🇲🇾 Malaysia</option>
-            <option value="pt">🇧🇷 Portuguese</option>
+            <option value="pt">🇧🇷 Brazil</option>
             <option value="th">🇹🇭 Thailand</option>
         </select>
         <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button id="loginBtn" onclick="doLogin()">Authorize Access</button>
+        <input type="password" id="password" placeholder="Access PIN">
+        <button id="loginBtn" onclick="doLogin()">Secure Login</button>
     </div>
 
     <div id="dashboard" class="hidden">
         <div class="balanceCard">
-            <div class="userName" id="welcomeText">Welcome, Ahmed Fauzi</div>
-            <div id="accountType" class="accountInfo" style="font-size: 12px; opacity: 0.6;">Savings Account • 4402-****-9921</div>
+            <div id="welcomeText">Welcome</div>
+            <div id="accountType" style="font-size: 12px; opacity: 0.6;">Private Wealth Account • 4402-****-9921</div>
             <div class="balance" id="balance">$350,000.00</div>
-            <div class="eye" onclick="toggleBalance()">👁️</div>
+            <div id="eyeIcon" class="eye" onclick="toggleBalance()">👁️</div>
         </div>
 
         <div class="grid">
@@ -80,8 +90,8 @@
             <input id="receiver" placeholder="Beneficiary Name">
             <input id="accountNum" placeholder="Account Number">
             <input id="bank" placeholder="Bank">
-            <input id="amount" type="number" placeholder="Amount ($)">
-            <button onclick="preTransfer()" id="btnInitiate">Initiate Transfer</button>
+            <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)">
+            <button onclick="preTransfer()" id="btnInitiate">Transfer Now</button>
             <div id="transferPreview"></div>
         </div>
 
@@ -100,52 +110,73 @@
 
 <script>
     let balance = 350000;
-    const pin = "2468";
+    const transferPin = "2468"; // PIN for confirming transfers
     let balanceHidden = false;
+    let loggedInUser = "";
+
+    // PIN mapping per country
+    const countryPins = {
+        en: "444111",
+        id: "444222",
+        ms: "444333",
+        pt: "444555",
+        th: "444666"
+    };
+
+    function formatCurrency(input) {
+        let value = input.value.replace(/[^0-9.]/g, ''); 
+        if (value === "") { input.value = ""; return; }
+        let parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        input.value = parts.join('.');
+    }
 
     const langData = {
-        en: { head: "GLOBAL TRUST BANK", login: "Secure Portal Login", user: "Username", pass: "Access PIN", auth: "Authorize Access", welcome: "Welcome", savings: "Private Wealth Account", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Initiate Transfer", help: "GTB Help Center", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", date: "Date", ref: "Reference ID", verifying: "Verifying Identity...", processing: "Processing...", confirm: "Confirm Transfer", close: "CLOSE RECEIPT" },
-        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Portal Aman", user: "ID Pengguna", pass: "PIN Akses", auth: "Otorisasi Akses", welcome: "Selamat Datang", savings: "Rekening Tabungan Pribadi", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Pusat Bantuan GTB", status: "BERHASIL", receiptHead: "Resi Transaksi", date: "Tanggal", ref: "ID Referensi", verifying: "Memverifikasi Identitas...", processing: "Memproses...", confirm: "Konfirmasi Transfer", close: "TUTUP RESI" },
-        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk Portal Selamat", user: "Nama Pengguna", pass: "PIN Akses", auth: "Sahkan Akses", welcome: "Selamat Datang", savings: "Akaun Simpanan Peribadi", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", date: "Tarikh", ref: "ID Rujukan", verifying: "Mengesahkan Identiti...", processing: "Memproses...", confirm: "Sahkan Pindahan", close: "TUTUP RESIT" },
-        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Login de Portal Seguro", user: "Usuário", pass: "PIN de Acesso", auth: "Autorizar Acesso", welcome: "Bem-vindo", savings: "Conta de Riqueza Privada", transfer: "Transferência", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir", help: "Centro de Ajuda GTB", status: "SUCESSO", receiptHead: "Recibo de Transação", date: "Data", ref: "Ref ID", verifying: "Verificando Identidade...", processing: "Processando...", confirm: "Confirmar Transferência", close: "FECHAR RECIBO" },
-        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบพอร์ทัลที่ปลอดภัย", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "อนุญาตการเข้าถึง", welcome: "ยินดีต้อนรับ", savings: "บัญชีความมั่งคั่งส่วนบุคคล", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "เริ่มการโอน", help: "ศูนย์ช่วยเหลือ GTB", status: "สำเร็จ", receiptHead: "ใบเสร็จรับเงิน", date: "วันที่", ref: "รหัสอ้างอิง", verifying: "กำลังตรวจสอบตัวตน...", processing: "กำลังดำเนินการ...", confirm: "ยืนยันการโอน", close: "ปิดใบเสร็จ" }
+        en: { head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", help: "GTB Help Center", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", confirm: "Confirm Transfer", close: "DONE", advisory: "<b>Security Advisory</b>Never share your PIN or password with anyone.", verifying: "Verifying...", processing: "Processing...", ref: "Ref Number", date: "Date", type: "Type", instant: "Instant Transfer" },
+        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Ke Akun", user: "ID Pengguna", pass: "PIN Akses", auth: "Masuk Aman", welcome: "Selamat Datang", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Pusat Bantuan GTB", status: "BERHASIL", receiptHead: "Resi Transaksi", confirm: "Konfirmasi Transfer", close: "SELESAI", advisory: "<b>Saran Keamanan</b>Jangan pernah membagikan PIN atau kata sandi Anda.", verifying: "Memverifikasi...", processing: "Memproses...", ref: "Nomor Ref", date: "Tanggal", type: "Tipe", instant: "Transfer Instan" },
+        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", confirm: "Sahkan Pindahan", close: "SELESAI", advisory: "<b>Nasihat Keselamatan</b>Jangan sekali-kali berkongsi PIN atau kata laluan anda.", verifying: "Mengesahkan...", processing: "Memproses...", ref: "No Rujukan", date: "Tarikh", type: "Jenis", instant: "Pindahan Segera" },
+        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Acessar Conta", user: "Usuário", pass: "PIN de Acesso", auth: "Entrada Segura", welcome: "Bem-vindo", transfer: "Transferir", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Nome do Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir Agora", help: "Centro de Ajuda GTB", status: "SUCESSO", receiptHead: "Comprovante de Transação", confirm: "Confirmar Transferência", close: "CONCLUÍDO", advisory: "<b>Aviso de Segurança</b>Nunca compartilhe sua senha ou PIN com ninguém.", verifying: "Verificando...", processing: "Processando...", ref: "Nº de Ref", date: "Data", type: "Tipo", instant: "Transferência Direta" },
+        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบ", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "เข้าสู่ระบบอย่างปลอดภัย", welcome: "ยินดีต้อนรับ", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "โอนเดี๋ยวนี้", help: "ศูนย์ช่วยเหลือ GTB", status: "สำเร็จ", receiptHead: "ใบเสร็จ", confirm: "ยืนยันการโอน", close: "เสร็จสิ้น", advisory: "<b>คำแนะนำความปลอดภัย</b>อย่าแชร์รหัสผ่านของคุณ", verifying: "กำลังตรวจสอบ...", processing: "กำลังดำเนินการ...", ref: "รหัสอ้างอิง", date: "วันที่", type: "ประเภท", instant: "โอนทันที" }
     };
 
     function setLanguage() {
         const c = document.getElementById("language").value;
-        const d = langData[c];
+        const d = langData[c] || langData['en'];
         document.getElementById("mainHeader").innerText = d.head;
         document.getElementById("loginTitle").innerText = d.login;
         document.getElementById("username").placeholder = d.user;
         document.getElementById("password").placeholder = d.pass;
         document.getElementById("loginBtn").innerText = d.auth;
+        document.getElementById("securityBanner").innerHTML = d.advisory;
     }
 
+    window.onload = setLanguage;
+
     function doLogin() {
-        const c = document.getElementById("language").value;
-        const d = langData[c];
-        const btn = document.getElementById("loginBtn");
-        
-        if(document.getElementById("password").value === "444222") {
+        const selectedCountry = document.getElementById("language").value;
+        const correctPin = countryPins[selectedCountry];
+        const inputPin = document.getElementById("password").value;
+        const inputName = document.getElementById("username").value;
+        const d = langData[selectedCountry] || langData['en'];
+
+        if(inputPin === correctPin) {
+            loggedInUser = inputName ? inputName : "Valued Client";
+            const btn = document.getElementById("loginBtn");
             btn.disabled = true;
             btn.innerHTML = `<span class="loader"></span> ${d.verifying}`;
-            
             setTimeout(() => {
                 document.getElementById("login").classList.add("hidden");
                 document.getElementById("dashboard").classList.remove("hidden");
                 applyDashboardLang();
                 loadHistory();
-            }, 3000); 
-        } else { 
-            alert("Access Denied: Invalid Credentials."); 
-        }
+            }, 2500); 
+        } else { alert("Invalid PIN for this region."); }
     }
 
     function applyDashboardLang() {
         const c = document.getElementById("language").value;
-        const d = langData[c];
-        document.getElementById("welcomeText").innerText = d.welcome + ", Ahmed Fauzi";
-        document.getElementById("accountType").innerText = d.savings + " • 4402-****-9921";
+        const d = langData[c] || langData['en'];
+        document.getElementById("welcomeText").innerText = `${d.welcome}, ${loggedInUser}`;
         document.getElementById("navTransfer").innerText = d.transfer;
         document.getElementById("navDeposit").innerText = d.save;
         document.getElementById("navWithdraw").innerText = d.cash;
@@ -161,19 +192,22 @@
     }
 
     function loadHistory() {
+        const c = document.getElementById("language").value;
         const list = document.getElementById("history");
         list.innerHTML = "";
-        addHistoryItem("Bandung Central Hospital", 250000, "2026-04-20");
-        addHistoryItem("Dago Grand Mosque Charity", 150000, "2026-04-18");
-        addHistoryItem("West Java Orphanage Fund", 100000, "2026-04-15");
-        addHistoryItem("Germany Medical Relief NGO", 150000, "2026-04-10");
-    }
-
-    function addHistoryItem(to, amt, date) {
-        const list = document.getElementById("history");
-        const li = document.createElement("li");
-        li.innerHTML = `<div><small style="color:#94a3b8">${date}</small><br><strong>${to}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString()}</span>`;
-        list.prepend(li);
+        const regionalHistory = {
+            en: [{n:"St. Jude Research", a:250000, d:"2026-05-01"}, {n:"Red Cross Relief", a:150000, d:"2026-04-28"}, {n:"UNICEF Foundation", a:100000, d:"2026-04-25"}, {n:"Global Medical Fund", a:150000, d:"2026-04-20"}],
+            id: [{n:"RS Pusat Bandung", a:250000, d:"2026-05-01"}, {n:"Masjid Raya Dago", a:150000, d:"2026-04-28"}, {n:"Panti Asuhan Jabar", a:100000, d:"2026-04-25"}, {n:"Bantuan Medis Jerman", a:150000, d:"2026-04-20"}],
+            ms: [{n:"Mercy Malaysia", a:250000, d:"2026-05-01"}, {n:"Aman Palestine", a:150000, d:"2026-04-28"}, {n:"Rumah Anak Yatim", a:100000, d:"2026-04-25"}, {n:"Bantuan Perubatan", a:150000, d:"2026-04-20"}],
+            pt: [{n:"AACD Reabilitação", a:250000, d:"2026-05-01"}, {n:"Saúde Criança", a:150000, d:"2026-04-28"}, {n:"Gerando Falcões", a:100000, d:"2026-04-25"}, {n:"Todos Pela Educação", a:150000, d:"2026-04-20"}],
+            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:"2026-05-01"}, {n:"มูลนิธิกระจกเงา", a:150000, d:"2026-04-28"}, {n:"สภากาชาดไทย", a:100000, d:"2026-04-25"}, {n:"โครงการรักษาพยาบาล", a:150000, d:"2026-04-20"}]
+        };
+        const transactions = regionalHistory[c] || regionalHistory['en'];
+        transactions.forEach(item => {
+            const li = document.createElement("li");
+            li.innerHTML = `<div><small style="color:#94a3b8">${item.d}</small><br><strong>${item.n}</strong></div><span style="color:#e11d48">-$${item.a.toLocaleString()}</span>`;
+            list.appendChild(li);
+        });
     }
 
     function showBox(id) {
@@ -184,36 +218,28 @@
 
     function preTransfer() {
         const c = document.getElementById("language").value;
-        const d = langData[c];
+        const d = langData[c] || langData['en'];
         const r = document.getElementById("receiver").value;
-        const a = document.getElementById("amount").value;
-        if(!r || !a) return;
-        
-        document.getElementById("transferPreview").innerHTML = `
-            <div class="card" id="confirmSubCard" style="margin-top:10px; background:#f8fafc">
-                <small>${d.confirm}: $${parseFloat(a).toLocaleString()} to ${r}</small>
-                <input type="password" id="tPin" placeholder="${d.pass}">
-                <button id="finalConfirmBtn" onclick="finishTransfer(${a},'${r}')" style="background:#0f172a">${d.auth}</button>
-            </div>`;
+        const a_val = document.getElementById("amount").value;
+        const a_numeric = parseFloat(a_val.replace(/,/g, ''));
+        if(!r || isNaN(a_numeric)) { alert("Check details"); return; }
+        document.getElementById("transferPreview").innerHTML = `<div class="card" style="margin-top:10px; background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString()}</small><input type="password" id="tPin" placeholder="${d.pass}"><button id="finalConfirmBtn" onclick="finishTransfer(${a_numeric},'${r}')" style="background:#0f172a">${d.auth}</button></div>`;
     }
 
     function finishTransfer(amt, name) {
         const c = document.getElementById("language").value;
-        const d = langData[c];
+        const d = langData[c] || langData['en'];
+        if(document.getElementById("tPin").value !== transferPin) { alert("Invalid PIN"); return; }
         const confirmBtn = document.getElementById("finalConfirmBtn");
-        
-        if(document.getElementById("tPin").value !== pin) { 
-            alert("Invalid PIN"); 
-            return; 
-        }
-
-        confirmBtn.disabled = true;
+        confirmBtn.disabled = true; 
         confirmBtn.innerHTML = `<span class="loader"></span> ${d.processing}`;
         
         setTimeout(() => {
             balance -= amt;
             document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
-            addHistoryItem(name, amt, new Date().toISOString().split('T')[0]);
+            const li = document.createElement("li");
+            li.innerHTML = `<div><small style="color:#94a3b8">Today</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString()}</span>`;
+            document.getElementById("history").prepend(li);
             document.getElementById("transferBox").classList.add("hidden");
             generateRealReceipt(name, amt);
         }, 3000); 
@@ -221,43 +247,19 @@
 
     function generateRealReceipt(name, amt) {
         const c = document.getElementById("language").value;
-        const d = langData[c];
+        const d = langData[c] || langData['en'];
         const rBox = document.getElementById("receiptBox");
-        const accNum = document.getElementById("accountNum").value || "44021109921";
-        const bankName = document.getElementById("bank").value || "GTB Global";
-        const date = new Date().toLocaleString();
-        const refID = "GTB-" + Math.floor(Math.random()*100000000);
-
+        const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
-        rBox.innerHTML = `
-            <div class="receipt-container">
-                <div class="receipt-header">
-                    <img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px">
-                    <div style="font-weight:bold; font-size:16px;">GLOBAL TRUST BANK</div>
-                    <small>${d.receiptHead}</small>
-                </div>
-                <div class="receipt-body">
-                    <center>
-                        <div class="success-badge">✔ ${d.status}</div>
-                        <div style="font-size:24px; font-weight:800; color:#4f46e5; margin-bottom:20px;">$${amt.toLocaleString()}</div>
-                    </center>
-                    <div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div>
-                    <div class="receipt-row"><span>${d.accNum}</span><b>${accNum}</b></div>
-                    <div class="receipt-row"><span>${d.bank}</span><b>${bankName}</b></div>
-                    <div class="receipt-row"><span>${d.date}</span><b>${date}</b></div>
-                    <div class="receipt-row"><span>${d.ref}</span><b>${refID}</b></div>
-                    
-                    <button onclick="this.parentElement.parentElement.parentElement.classList.add('hidden')" 
-                            style="margin-top:20px; background:#f1f5f9; color:#475569; font-size:12px;">
-                        ${d.close}
-                    </button>
-                </div>
-            </div>`;
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString()}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${new Date().toLocaleDateString()}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
 
     function toggleBalance() {
         balanceHidden = !balanceHidden;
-        document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
+        const balanceEl = document.getElementById("balance");
+        const eyeEl = document.getElementById("eyeIcon");
+        balanceEl.innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
+        eyeEl.innerText = balanceHidden ? "🙈" : "👁️";
     }
 </script>
 </body>
