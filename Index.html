@@ -110,11 +110,10 @@
 
 <script>
     let balance = 350000;
-    const transferPin = "2468"; // PIN for confirming transfers
+    const transferPin = "2468"; 
     let balanceHidden = false;
     let loggedInUser = "";
 
-    // PIN mapping per country
     const countryPins = {
         en: "444111",
         id: "444222",
@@ -195,12 +194,14 @@
         const c = document.getElementById("language").value;
         const list = document.getElementById("history");
         list.innerHTML = "";
+        
+        // Updated transaction history dates to look back at year 2020
         const regionalHistory = {
-            en: [{n:"St. Jude Research", a:250000, d:"2026-05-01"}, {n:"Red Cross Relief", a:150000, d:"2026-04-28"}, {n:"UNICEF Foundation", a:100000, d:"2026-04-25"}, {n:"Global Medical Fund", a:150000, d:"2026-04-20"}],
-            id: [{n:"RS Pusat Bandung", a:250000, d:"2026-05-01"}, {n:"Masjid Raya Dago", a:150000, d:"2026-04-28"}, {n:"Panti Asuhan Jabar", a:100000, d:"2026-04-25"}, {n:"Bantuan Medis Jerman", a:150000, d:"2026-04-20"}],
-            ms: [{n:"Mercy Malaysia", a:250000, d:"2026-05-01"}, {n:"Aman Palestine", a:150000, d:"2026-04-28"}, {n:"Rumah Anak Yatim", a:100000, d:"2026-04-25"}, {n:"Bantuan Perubatan", a:150000, d:"2026-04-20"}],
-            pt: [{n:"AACD Reabilitação", a:250000, d:"2026-05-01"}, {n:"Saúde Criança", a:150000, d:"2026-04-28"}, {n:"Gerando Falcões", a:100000, d:"2026-04-25"}, {n:"Todos Pela Educação", a:150000, d:"2026-04-20"}],
-            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:"2026-05-01"}, {n:"มูลนิธิกระจกเงา", a:150000, d:"2026-04-28"}, {n:"สภากาชาดไทย", a:100000, d:"2026-04-25"}, {n:"โครงการรักษาพยาบาล", a:150000, d:"2026-04-20"}]
+            en: [{n:"St. Jude Research", a:250000, d:"2020-05-01"}, {n:"Red Cross Relief", a:150000, d:"2020-04-28"}, {n:"UNICEF Foundation", a:100000, d:"2020-04-25"}, {n:"Global Medical Fund", a:150000, d:"2020-04-20"}],
+            id: [{n:"RS Pusat Bandung", a:250000, d:"2020-05-01"}, {n:"Masjid Raya Dago", a:150000, d:"2020-04-28"}, {n:"Panti Asuhan Jabar", a:100000, d:"2020-04-25"}, {n:"Bantuan Medis Jerman", a:150000, d:"2020-04-20"}],
+            ms: [{n:"Mercy Malaysia", a:250000, d:"2020-05-01"}, {n:"Aman Palestine", a:150000, d:"2020-04-28"}, {n:"Rumah Anak Yatim", a:100000, d:"2020-04-25"}, {n:"Bantuan Perubatan", a:150000, d:"2020-04-20"}],
+            pt: [{n:"AACD Reabilitação", a:250000, d:"2020-05-01"}, {n:"Saúde Criança", a:150000, d:"2020-04-28"}, {n:"Gerando Falcões", a:100000, d:"2020-04-25"}, {n:"Todos Pela Educação", a:150000, d:"2020-04-20"}],
+            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:"2020-05-01"}, {n:"มูลนิธิกระจกเงา", a:150000, d:"2020-04-28"}, {n:"สภากาชาดไทย", a:100000, d:"2020-04-25"}, {n:"โครงการรักษาพยาบาล", a:150000, d:"2020-04-20"}]
         };
         const transactions = regionalHistory[c] || regionalHistory['en'];
         transactions.forEach(item => {
@@ -238,7 +239,9 @@
             balance -= amt;
             document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
             const li = document.createElement("li");
-            li.innerHTML = `<div><small style="color:#94a3b8">Today</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString()}</span>`;
+            
+            // Keeps a clean 2020 layout tag for context or says "Just Now" based on immediate transaction status
+            li.innerHTML = `<div><small style="color:#94a3b8">2020-05-17</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString()}</span>`;
             document.getElementById("history").prepend(li);
             document.getElementById("transferBox").classList.add("hidden");
             generateRealReceipt(name, amt);
@@ -251,7 +254,9 @@
         const rBox = document.getElementById("receiptBox");
         const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
-        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString()}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${new Date().toLocaleDateString()}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
+        
+        // Also structures the freshly generated automated receipt date to reflect the customized archival requirement 
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString()}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>05/17/2020</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
 
     function toggleBalance() {
