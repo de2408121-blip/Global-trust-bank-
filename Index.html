@@ -74,7 +74,7 @@
         <div class="balanceCard">
             <div id="welcomeText">Welcome</div>
             <div id="accountType" style="font-size: 12px; opacity: 0.6;">Private Wealth Account • 4402-****-9921</div>
-            <div class="balance" id="balance">$350,000.00</div>
+            <div class="balance" id="balance">$590,000.75</div>
             <div id="eyeIcon" class="eye" onclick="toggleBalance()">👁️</div>
         </div>
 
@@ -109,7 +109,7 @@
 </div>
 
 <script>
-    let balance = 350000;
+    let balance = 590000.75;
     const transferPin = "2468"; 
     let balanceHidden = false;
     let loggedInUser = "";
@@ -166,6 +166,7 @@
             setTimeout(() => {
                 document.getElementById("login").classList.add("hidden");
                 document.getElementById("dashboard").classList.remove("hidden");
+                document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 applyDashboardLang();
                 loadHistory();
             }, 2500); 
@@ -190,18 +191,48 @@
         document.getElementById("helpText").innerText = d.help;
     }
 
+    // Formats any date object cleanly into YYYY-MM-DD format
+    function getFormattedDate(dateObj) {
+        let year = dateObj.getFullYear();
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Helper to format date and standard 12-hour AM/PM system string for receipt layout
+    function getFormattedDateTime(dateObj) {
+        let year = dateObj.getFullYear();
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        
+        let hours = dateObj.getHours();
+        let minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // Converts 0 to 12
+        let strTime = String(hours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
+
+        return `${month}/${day}/${year} ${strTime}`;
+    }
+
     function loadHistory() {
         const c = document.getElementById("language").value;
         const list = document.getElementById("history");
         list.innerHTML = "";
         
-        // Updated transaction history dates to look back at year 2020
+        // Base static log records modified to dynamic past dates relative to current runtime year
+        const baseDate = new Date();
+        const d1 = new Date(); d1.setDate(baseDate.getDate() - 1);
+        const d2 = new Date(); d2.setDate(baseDate.getDate() - 3);
+        const d3 = new Date(); d3.setDate(baseDate.getDate() - 5);
+        const d4 = new Date(); d4.setDate(baseDate.getDate() - 7);
+
         const regionalHistory = {
-            en: [{n:"St. Jude Research", a:250000, d:"2020-05-01"}, {n:"Red Cross Relief", a:150000, d:"2020-04-28"}, {n:"UNICEF Foundation", a:100000, d:"2020-04-25"}, {n:"Global Medical Fund", a:150000, d:"2020-04-20"}],
-            id: [{n:"RS Pusat Bandung", a:250000, d:"2020-05-01"}, {n:"Masjid Raya Dago", a:150000, d:"2020-04-28"}, {n:"Panti Asuhan Jabar", a:100000, d:"2020-04-25"}, {n:"Bantuan Medis Jerman", a:150000, d:"2020-04-20"}],
-            ms: [{n:"Mercy Malaysia", a:250000, d:"2020-05-01"}, {n:"Aman Palestine", a:150000, d:"2020-04-28"}, {n:"Rumah Anak Yatim", a:100000, d:"2020-04-25"}, {n:"Bantuan Perubatan", a:150000, d:"2020-04-20"}],
-            pt: [{n:"AACD Reabilitação", a:250000, d:"2020-05-01"}, {n:"Saúde Criança", a:150000, d:"2020-04-28"}, {n:"Gerando Falcões", a:100000, d:"2020-04-25"}, {n:"Todos Pela Educação", a:150000, d:"2020-04-20"}],
-            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:"2020-05-01"}, {n:"มูลนิธิกระจกเงา", a:150000, d:"2020-04-28"}, {n:"สภากาชาดไทย", a:100000, d:"2020-04-25"}, {n:"โครงการรักษาพยาบาล", a:150000, d:"2020-04-20"}]
+            en: [{n:"St. Jude Research", a:250000, d:getFormattedDate(d1)}, {n:"Red Cross Relief", a:150000, d:getFormattedDate(d2)}, {n:"UNICEF Foundation", a:100000, d:getFormattedDate(d3)}, {n:"Global Medical Fund", a:150000, d:getFormattedDate(d4)}],
+            id: [{n:"RS Pusat Bandung", a:250000, d:getFormattedDate(d1)}, {n:"Masjid Raya Dago", a:150000, d:getFormattedDate(d2)}, {n:"Panti Asuhan Jabar", a:100000, d:getFormattedDate(d3)}, {n:"Bantuan Medis Jerman", a:150000, d:getFormattedDate(d4)}],
+            ms: [{n:"Mercy Malaysia", a:250000, d:getFormattedDate(d1)}, {n:"Aman Palestine", a:150000, d:getFormattedDate(d2)}, {n:"Rumah Anak Yatim", a:100000, d:getFormattedDate(d3)}, {n:"Bantuan Perubatan", a:150000, d:getFormattedDate(d4)}],
+            pt: [{n:"AACD Reabilitação", a:250000, d:getFormattedDate(d1)}, {n:"Saúde Criança", a:150000, d:getFormattedDate(d2)}, {n:"Gerando Falcões", a:100000, d:getFormattedDate(d3)}, {n:"Todos Pela Educação", a:150000, d:getFormattedDate(d4)}],
+            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:getFormattedDate(d1)}, {n:"มูลนิธิกระจกเงา", a:150000, d:getFormattedDate(d2)}, {n:"สภากาชาดไทย", a:100000, d:getFormattedDate(d3)}, {n:"โครงการรักษาพยาบาล", a:150000, d:getFormattedDate(d4)}]
         };
         const transactions = regionalHistory[c] || regionalHistory['en'];
         transactions.forEach(item => {
@@ -224,7 +255,7 @@
         const a_val = document.getElementById("amount").value;
         const a_numeric = parseFloat(a_val.replace(/,/g, ''));
         if(!r || isNaN(a_numeric)) { alert("Check details"); return; }
-        document.getElementById("transferPreview").innerHTML = `<div class="card" style="margin-top:10px; background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString()}</small><input type="password" id="tPin" placeholder="${d.pass}"><button id="finalConfirmBtn" onclick="finishTransfer(${a_numeric},'${r}')" style="background:#0f172a">${d.auth}</button></div>`;
+        document.getElementById("transferPreview").innerHTML = `<div class="card" style="margin-top:10px; background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small><input type="password" id="tPin" placeholder="${d.pass}"><button id="finalConfirmBtn" onclick="finishTransfer(${a_numeric},'${r}')" style="background:#0f172a">${d.auth}</button></div>`;
     }
 
     function finishTransfer(amt, name) {
@@ -237,33 +268,34 @@
         
         setTimeout(() => {
             balance -= amt;
-            document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
-            const li = document.createElement("li");
+            document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
-            // Keeps a clean 2020 layout tag for context or says "Just Now" based on immediate transaction status
-            li.innerHTML = `<div><small style="color:#94a3b8">2020-05-17</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString()}</span>`;
-            document.getElementById("history").prepend(li);
+            // Instantiates real-time dynamic stamp object upon immediate execution
+            const now = new Date();
+            const li = document.createElement("li");
+            li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
+     document.getElementById("history").prepend(li);
             document.getElementById("transferBox").classList.add("hidden");
-            generateRealReceipt(name, amt);
+            generateRealReceipt(name, amt, now);
         }, 3000); 
     }
 
-    function generateRealReceipt(name, amt) {
+    function generateRealReceipt(name, amt, timestampObj) {
         const c = document.getElementById("language").value;
         const d = langData[c] || langData['en'];
         const rBox = document.getElementById("receiptBox");
         const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
         
-        // Also structures the freshly generated automated receipt date to reflect the customized archival requirement 
-        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString()}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>05/17/2020</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
+        // Uses getFormattedDateTime helper to dynamically project exact time and current year inside receipt block
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
 
     function toggleBalance() {
         balanceHidden = !balanceHidden;
         const balanceEl = document.getElementById("balance");
         const eyeEl = document.getElementById("eyeIcon");
-        balanceEl.innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString();
+        balanceEl.innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         eyeEl.innerText = balanceHidden ? "🙈" : "👁️";
     }
 </script>
