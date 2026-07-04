@@ -54,8 +54,8 @@
 <div class="container">
     <div id="login" class="card">
         <div class="login-brand">
-            <!-- New image link added here -->
-            <img src="https://i.ibb.co/xK0sxM8W/image.png" alt="Logo">
+            <!-- Updated to local file path -->
+            <img src="File_000000009678724680189a55ffec1a9b.png" alt="Logo">
             <h3 id="loginTitle" style="margin:0; font-size: 24px; color: #0f172a;">Sign In</h3>
         </div>
         <div id="securityBanner" class="security-banner"></div>
@@ -351,8 +351,8 @@
         const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
         
-        // New image link added here into receipt template
-        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://i.ibb.co/xK0sxM8W/image.png" style="width:45px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
+        // Updated to local file path inside the receipt template
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:45px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
 
     function toggleBalance() {
