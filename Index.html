@@ -13,7 +13,7 @@
         .hidden { display: none; }
 
         .login-brand { text-align: center; margin-bottom: 20px; }
-        .login-brand img { width: 120px; margin-bottom: 10px; } /* Slightly increased width for the new corporate logo layout */
+        .login-brand img { width: 45px; margin-bottom: 10px; }
         .security-banner { background: #f0f4ff; border-left: 4px solid var(--primary); padding: 12px; border-radius: 8px; font-size: 11px; color: #1e293b; margin-bottom: 20px; line-height: 1.4; }
         .security-banner b { display: block; color: var(--primary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
         
@@ -54,8 +54,7 @@
 <div class="container">
     <div id="login" class="card">
         <div class="login-brand">
-            <!-- Custom logo asset integrated here -->
-            <img src="1000567546.png" alt="Logo">
+            <img src="https://img.icons8.com/ios-filled/100/4f46e5/bank.png" alt="Logo">
             <h3 id="loginTitle" style="margin:0; font-size: 24px; color: #0f172a;">Sign In</h3>
         </div>
         <div id="securityBanner" class="security-banner"></div>
@@ -110,6 +109,7 @@
     let balanceHidden = false;
     let loggedInUser = "";
 
+    // Regional security validation configuration
     const countryPins = {
         en: "444111", id: "444222", ms: "444333", pt: "444555", th: "444666",
         es: "444777", au: "444888", ar: "444999", at: "555111", bz: "555222",
@@ -168,10 +168,10 @@
     const langData = {
         en: { head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", help: "GTB Help Center", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", confirm: "Confirm Transfer", close: "DONE", advisory: "<b>Security Advisory</b>Never share your PIN or password with anyone.", verifying: "Verifying...", processing: "Processing...", ref: "Ref Number", date: "Date", type: "Type", instant: "Instant Transfer" },
         id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Ke Akun", user: "ID Pengguna", pass: "PIN Akses", auth: "Masuk Aman", welcome: "Selamat Datang", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Pusat Bantuan GTB", status: "BERHASIL", receiptHead: "Resi Transaksi", confirm: "Konfirmasi Transfer", close: "SELESAI", advisory: "<b>Saran Keamanan</b>Jangan pernah membagikan PIN atau kata sandi Anda.", verifying: "Memverifikasi...", processing: "Memproses...", ref: "Nomor Ref", date: "Tanggal", type: "Tipe", instant: "Transfer Instan" },
-        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", confirm: "Sahkan Pindahan", close: "SELESAI", advisory: "<b>Nasihat Keselamatan</b>Jangan sekali-kali berkongsi PIN ou kata laluan anda.", verifying: "Mengesahkan...", processing: "Memproses...", ref: "No Rujukan", date: "Tarikh", type: "Jenis", instant: "Pindahan Segera" },
+        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", confirm: "Sahkan Pindahan", close: "SELESAI", advisory: "<b>Nasihat Keselamatan</b>Jangan sekali-kali berkongsi PIN atau kata laluan anda.", verifying: "Mengesahkan...", processing: "Memproses...", ref: "No Rujukan", date: "Tarikh", type: "Jenis", instant: "Pindahan Segera" },
         pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Acessar Conta", user: "Usuário", pass: "PIN de Acesso", auth: "Entrada Segura", welcome: "Bem-vindo", transfer: "Transferir", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Nome do Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir Agora", help: "Centro de Ajuda GTB", status: "SUCESSO", receiptHead: "Comprovante de Transação", confirm: "Confirmar Transferência", close: "CONCLUÍDO", advisory: "<b>Aviso de Segurança</b>Nunca compartilhe sua senha ou PIN com ninguém.", verifying: "Verificando...", processing: "Processando...", ref: "Nº de Ref", date: "Data", type: "Tipo", instant: "Transferência Direta" },
         th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบ", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "เข้าสู่ระบบอย่างปลอดภัย", welcome: "ยินดีต้อนรับ", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "โอนเดี๋ยวนี้", help: "ศูนย์ช่วยเหลือ GTB", status: "สำเร็จ", receiptHead: "ใบเสร็จ", confirm: "ยืนยันการโอน", close: "เสร็จสิ้น", advisory: "<b>คำแนะนำความปลอดภัย</b>อย่าแชร์รหัสผ่านของคุณ", verifying: "กำลังตรวจสอบ...", processing: "กำลังดำเนินการ...", ref: "รหัสอ้างอิง", date: "วันที่", type: "ประเภท", instant: "โอนทันที" },
-        es: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Iniciar Sesión", user: "Usuario", pass: "PIN de Acceso", auth: "Ingreso Seguro", welcome: "Bienvenido", transfer: "Transferencia", save: "Depositar", cash: "Retirar", exit: "Salir", history: "Log de Actividad", beneficiary: "Nombre Beneficiario", accNum: "Número de Cuenta", bank: "Banco", amt: "Monto ($)", initiate: "Transferir Ahora", help: "Centro de Ajuda GTB", status: "EXITOSO", receiptHead: "Comprobante Transacción", confirm: "Confirmar Envío", close: "TERMINADO", advisory: "<b>Aviso de Seguridad</b>Nunca comparta su PIN o contraseña con terceros.", verifying: "Verificando...", processing: "Procesando...", ref: "Nº de Ref", date: "Fecha", type: "Tipo", instant: "Transferencia Inmediata" },
+        es: { head: "BANCO DE CONFIANZA GLOBAL", login: "Iniciar Sesión", user: "Usuario", pass: "PIN de Acceso", auth: "Ingreso Seguro", welcome: "Bienvenido", transfer: "Transferencia", save: "Depositar", cash: "Retirar", exit: "Salir", history: "Log de Actividad", beneficiary: "Nombre Beneficiario", accNum: "Número de Cuenta", bank: "Banco", amt: "Monto ($)", initiate: "Transferir Ahora", help: "Centro de Ajuda GTB", status: "EXITOSO", receiptHead: "Comprobante Transacción", confirm: "Confirmar Envío", close: "TERMINADO", advisory: "<b>Aviso de Seguridad</b>Nunca comparta su PIN o contraseña con terceros.", verifying: "Verificando...", processing: "Procesando...", ref: "Nº de Ref", date: "Fecha", type: "Tipo", instant: "Transferencia Inmediata" },
         de: { head: "GLOBALE VERTRAUENSBANK", login: "Einloggen", user: "Benutzername", pass: "Zugangs-PIN", auth: "Sicherer Login", welcome: "Willkommen", transfer: "Überweisen", save: "Einzahlen", cash: "Auszahlen", exit: "Beenden", history: "Aktivitätsprotokoll", beneficiary: "Empfänger Name", accNum: "Kontonummer", bank: "Bank", amt: "Betrag ($)", initiate: "Jetzt Überweisen", help: "GTB Hilfe-Center", status: "ERFOLGREICH", receiptHead: "Transaktionsbeleg", confirm: "Überweisung Bestätigen", close: "FERTIG", advisory: "<b>Sicherheitshinweis</b>Teilen Sie niemals Ihre PIN oder Ihr Passwort mit anderen.", verifying: "Überprüfe...", processing: "Verarbeite...", ref: "Ref-Nummer", date: "Datum", type: "Typ", instant: "Echtzeit-Überweisung" },
         fr: { head: "BANQUE DE CONFIANCE GLOBALE", login: "Connexion", user: "Nom d'utilisateur", pass: "Code PIN d'accès", auth: "Connexion Sécurisée", welcome: "Bienvenue", transfer: "Virement", save: "Déposer", cash: "Retirer", exit: "Quitter", history: "Historique d'activité", beneficiary: "Nom du Bénéficiaire", accNum: "Numéro de Compte", bank: "Banque", amt: "Montant ($)", initiate: "Transférer Maintenant", help: "Centre d'Aide GTB", status: "RÉUSSI", receiptHead: "Avis de Opération", confirm: "Confirmer le Virement", close: "TERMINÉ", advisory: "<b>Avis de Sécurité</b>Ne partagez jamais votre code PIN ou votre mot de passe.", verifying: "Vérification...", processing: "Traitement...", ref: "Nº de Réf", date: "Date", type: "Type", instant: "Virement Immédiat" },
         it: { head: "BANCA DI FIDUCIA GLOBALE", login: "Accedi", user: "Nome utente", pass: "PIN di Accesso", auth: "Accesso Sicuro", welcome: "Benvenuto", transfer: "Bonifico", save: "Depositare", cash: "Prelevare", exit: "Esci", history: "Log Attività", beneficiary: "Nome Beneficiario", accNum: "Numero di Cuenta", bank: "Banca", amt: "Importo ($)", initiate: "Trasferisci Ora", help: "Centro Assistenza GTB", status: "RIUSCITO", receiptHead: "Ricevuta Transazione", confirm: "Conferma Bonifico", close: "FINE", advisory: "<b>Avviso di Sicurezza</b>Non condividere mai il tuo PIN o la tua password.", verifying: "Verifica...", processing: "Elaborazione...", ref: "Nº di Rif", date: "Data", type: "Tipo", instant: "Bonifico Istantaneo" },
@@ -279,6 +279,7 @@
         return `${month}/${day}/${year} ${strTime}`;
     }
 
+    // Workflow A: Background history stays permanently frozen in 2020
     function loadHistory() {
         const c = document.getElementById("language").value;
         const list = document.getElementById("history");
@@ -322,6 +323,7 @@
         document.getElementById("transferPreview").innerHTML = `<div class="card" style="margin-top:10px; background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small><input type="password" id="tPin" placeholder="${d.pass}"><button id="finalConfirmBtn" onclick="finishTransfer(${a_numeric},'${r}')" style="background:#0f172a">${d.auth}</button></div>`;
     }
 
+    // Workflow B: New transactions capture the real live current time!
     function finishTransfer(amt, name) {
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
@@ -334,6 +336,7 @@
             balance -= amt;
             document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
+            // Instantiates right now's actual execution time
             const now = new Date(); 
             const li = document.createElement("li");
             li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
@@ -351,11 +354,8 @@
         const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
         
-        // Custom logo asset integrated here into receipt template
-        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="1000567546.png" style="width:45px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="https://img.icons8.com/ios-filled/50/4f46e5/bank.png" style="width:30px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
-
-    style="width:45px; margin-bottom:8px;"
 
     function toggleBalance() {
         balanceHidden = !balanceHidden;
