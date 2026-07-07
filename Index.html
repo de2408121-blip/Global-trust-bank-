@@ -45,6 +45,11 @@
         .helpBtn { margin-top: 30px; background: var(--dark-bg); color: white; border-radius: 15px; padding: 15px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Loading Overlay Styles */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .blink-logo { width: 120px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -54,13 +59,11 @@
 <div class="container">
     <div id="login" class="card">
         <div class="login-brand">
-            <!-- Updated to local file path -->
             <img src="File_000000009678724680189a55ffec1a9b.png" alt="Logo">
             <h3 id="loginTitle" style="margin:0; font-size: 24px; color: #0f172a;">Sign In</h3>
         </div>
         <div id="securityBanner" class="security-banner"></div>
-        <select id="language" onchange="setLanguage()">
-            </select>
+        <select id="language" onchange="setLanguage()"></select>
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Access PIN">
         <button id="loginBtn" onclick="doLogin()">Secure Login</button>
@@ -109,6 +112,21 @@
     const transferPin = "2468"; 
     let balanceHidden = false;
     let loggedInUser = "";
+
+    // Helper: Show the blinking overlay
+    function showLoadingOverlay(message) {
+        const overlay = document.createElement("div");
+        overlay.className = "loading-overlay";
+        overlay.id = "activeOverlay";
+        overlay.innerHTML = `<img src="File_000000009678724680189a55ffec1a9b.png" class="blink-logo"><p style="margin-top:20px; font-weight:600; color:#1e293b;">${message}</p>`;
+        document.body.appendChild(overlay);
+    }
+
+    // Helper: Remove the overlay
+    function removeLoadingOverlay() {
+        const el = document.getElementById("activeOverlay");
+        if (el) el.remove();
+    }
 
     const countryPins = {
         en: "444111", id: "444222", ms: "444333", pt: "444555", th: "444666",
@@ -181,15 +199,8 @@
 
     function getTranslationDictionary(countryCode) {
         if (langData[countryCode]) return langData[countryCode];
-        const customRoutingMatrix = {
-            es: 'es', ar: 'es', do: 'es', ec: 'es', mx: 'es', pa: 'es',
-            at: 'de', de: 'de',
-            fr: 'fr', lu: 'fr',
-            pt_eu: 'pt', pt: 'pt',
-            it: 'it', jp: 'jp', tr: 'tr'
-        };
-        const targetLanguage = customRoutingMatrix[countryCode];
-        return langData[targetLanguage] || langData['en'];
+        const customRoutingMatrix = { es: 'es', ar: 'es', do: 'es', ec: 'es', mx: 'es', pa: 'es', at: 'de', de: 'de', fr: 'fr', lu: 'fr', pt_eu: 'pt', pt: 'pt', it: 'it', jp: 'jp', tr: 'tr' };
+        return langData[customRoutingMatrix[countryCode]] || langData['en'];
     }
 
     function loadDropdownOptions() {
@@ -221,15 +232,13 @@
         const selectedCountry = document.getElementById("language").value;
         const correctPin = countryPins[selectedCountry];
         const inputPin = document.getElementById("password").value;
-        const inputName = document.getElementById("username").value;
         const d = getTranslationDictionary(selectedCountry);
 
         if(inputPin === correctPin) {
-            loggedInUser = inputName ? inputName : "Valued Client";
-            const btn = document.getElementById("loginBtn");
-            btn.disabled = true;
-            btn.innerHTML = `<span class="loader"></span> ${d.verifying}`;
+            loggedInUser = document.getElementById("username").value || "Valued Client";
+            showLoadingOverlay(d.verifying);
             setTimeout(() => {
+                removeLoadingOverlay();
                 document.getElementById("login").classList.add("hidden");
                 document.getElementById("dashboard").classList.remove("hidden");
                 document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -268,27 +277,21 @@
         let year = dateObj.getFullYear();
         let month = String(dateObj.getMonth() + 1).padStart(2, '0');
         let day = String(dateObj.getDate()).padStart(2, '0');
-        
         let hours = dateObj.getHours();
         let minutes = String(dateObj.getMinutes()).padStart(2, '0');
         let ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; 
-        let strTime = String(hours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
-
-        return `${month}/${day}/${year} ${strTime}`;
+        hours = hours % 12; hours = hours ? hours : 12; 
+        return `${month}/${day}/${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
     }
 
     function loadHistory() {
         const c = document.getElementById("language").value;
         const list = document.getElementById("history");
         list.innerHTML = "";
-        
         const d1 = new Date(2020, 5, 7);
         const d2 = new Date(2020, 5, 5);
         const d3 = new Date(2020, 5, 3);
         const d4 = new Date(2020, 5, 1);
-
         const regionalHistory = {
             en: [{n:"St. Jude Research", a:250000, d:getFormattedDate(d1)}, {n:"Red Cross Relief", a:150000, d:getFormattedDate(d2)}, {n:"UNICEF Foundation", a:100000, d:getFormattedDate(d3)}, {n:"Global Medical Fund", a:150000, d:getFormattedDate(d4)}],
             id: [{n:"RS Pusat Bandung", a:250000, d:getFormattedDate(d1)}, {n:"Masjid Raya Dago", a:150000, d:getFormattedDate(d2)}, {n:"Panti Asuhan Jabar", a:100000, d:getFormattedDate(d3)}, {n:"Bantuan Medis Jerman", a:150000, d:getFormattedDate(d4)}],
@@ -296,10 +299,8 @@
             pt: [{n:"AACD Reabilitação", a:250000, d:getFormattedDate(d1)}, {n:"Saúde Criança", a:150000, d:getFormattedDate(d2)}, {n:"Gerando Falcões", a:100000, d:getFormattedDate(d3)}, {n:"Todos Pela Educação", a:150000, d:getFormattedDate(d4)}],
             th: [{n:"โรงพยาบาลศิริราช", a:250000, d:getFormattedDate(d1)}, {n:"มูลนิธิกระจกเงา", a:150000, d:getFormattedDate(d2)}, {n:"สภากาชาดไทย", a:100000, d:getFormattedDate(d3)}, {n:"โครงการรักษาพยาบาล", a:150000, d:getFormattedDate(d4)}]
         };
-
         const currentActiveLang = ['id','ms','pt','th'].includes(c) ? c : 'en';
-        const transactions = regionalHistory[currentActiveLang] || regionalHistory['en'];
-        transactions.forEach(item => {
+        (regionalHistory[currentActiveLang] || regionalHistory['en']).forEach(item => {
             const li = document.createElement("li");
             li.innerHTML = `<div><small style="color:#94a3b8">${item.d}</small><br><strong>${item.n}</strong></div><span style="color:#e11d48">-$${item.a.toLocaleString()}</span>`;
             list.appendChild(li);
@@ -326,18 +327,16 @@
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
         if(document.getElementById("tPin").value !== transferPin) { alert("Invalid PIN"); return; }
-        const confirmBtn = document.getElementById("finalConfirmBtn");
-        confirmBtn.disabled = true; 
-        confirmBtn.innerHTML = `<span class="loader"></span> ${d.processing}`;
+        
+        showLoadingOverlay(d.processing);
         
         setTimeout(() => {
+            removeLoadingOverlay();
             balance -= amt;
             document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
             const now = new Date(); 
             const li = document.createElement("li");
             li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
-            
             document.getElementById("history").prepend(li);
             document.getElementById("transferBox").classList.add("hidden");
             generateRealReceipt(name, amt, now);
@@ -350,8 +349,6 @@
         const rBox = document.getElementById("receiptBox");
         const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
-        
-        // Updated to local file path inside the receipt template
         rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:45px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
 
