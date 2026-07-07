@@ -71,8 +71,11 @@
 
     <div id="dashboard" class="hidden">
         <div class="balanceCard">
-            <div id="welcomeText">Welcome</div>
-            <div id="accountType" style="font-size: 12px; opacity: 0.6;">Private Wealth Account • 4402-****-9921</div>
+            <div id="profileDisplay" style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                <img src="1000680085.jpg" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; object-fit: cover;">
+                <div id="welcomeText" style="font-size: 18px; font-weight: 600;">Welcome</div>
+            </div>
+            <div id="accountType" style="font-size: 12px; opacity: 0.6; margin-bottom: 5px;">Private Wealth Account • 4402-****-9921</div>
             <div class="balance" id="balance">$590,000.75</div>
             <div id="eyeIcon" class="eye" onclick="toggleBalance()">👁️</div>
         </div>
@@ -113,7 +116,6 @@
     let balanceHidden = false;
     let loggedInUser = "";
 
-    // Helper: Show the blinking overlay
     function showLoadingOverlay(message) {
         const overlay = document.createElement("div");
         overlay.className = "loading-overlay";
@@ -122,7 +124,6 @@
         document.body.appendChild(overlay);
     }
 
-    // Helper: Remove the overlay
     function removeLoadingOverlay() {
         const el = document.getElementById("activeOverlay");
         if (el) el.remove();
@@ -237,13 +238,28 @@
         if(inputPin === correctPin) {
             loggedInUser = document.getElementById("username").value || "Valued Client";
             showLoadingOverlay(d.verifying);
+            
             setTimeout(() => {
                 removeLoadingOverlay();
-                document.getElementById("login").classList.add("hidden");
-                document.getElementById("dashboard").classList.remove("hidden");
-                document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                applyDashboardLang();
-                loadHistory();
+                
+                // Show profile splash screen
+                const splash = document.createElement("div");
+                splash.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;";
+                splash.innerHTML = `
+                    <img src="1000680085.jpg" style="width:150px; height:150px; border-radius:50%; margin-bottom:20px; border:5px solid #6366f1; object-fit:cover;">
+                    <p style="font-size:24px; font-weight:600; color:#1e293b;">${d.welcome}, ${loggedInUser}</p>
+                `;
+                document.body.appendChild(splash);
+
+                setTimeout(() => {
+                    splash.remove();
+                    document.getElementById("login").classList.add("hidden");
+                    document.getElementById("dashboard").classList.remove("hidden");
+                    document.getElementById("welcomeText").innerText = `${d.welcome}, ${loggedInUser}`;
+                    document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    applyDashboardLang();
+                    loadHistory();
+                }, 3000); // Stays for 3 seconds
             }, 2500); 
         } else { alert("Invalid PIN for this region."); }
     }
@@ -251,7 +267,6 @@
     function applyDashboardLang() {
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
-        document.getElementById("welcomeText").innerText = `${d.welcome}, ${loggedInUser}`;
         document.getElementById("navTransfer").innerText = d.transfer;
         document.getElementById("navDeposit").innerText = d.save;
         document.getElementById("navWithdraw").innerText = d.cash;
