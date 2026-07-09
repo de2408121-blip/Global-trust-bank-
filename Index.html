@@ -46,8 +46,8 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Loading Overlay Styles */
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .notification-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .blink-logo { width: 120px; animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
@@ -91,6 +91,9 @@
             <h4 id="tTitle">Funds Transfer</h4>
             <input id="receiver" placeholder="Beneficiary Name">
             <input id="accountNum" placeholder="Account Number">
+            <select id="transferCountry">
+                <option value="" id="selectPlaceholder" disabled selected>Select Destination Country</option>
+            </select>
             <input id="bank" placeholder="Bank">
             <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)">
             <button onclick="preTransfer()" id="btnInitiate">Transfer Now</button>
@@ -127,6 +130,20 @@
     function removeLoadingOverlay() {
         const el = document.getElementById("activeOverlay");
         if (el) el.remove();
+    }
+
+    function showNotification(msg) {
+        const overlay = document.createElement("div");
+        overlay.className = "notification-overlay";
+        overlay.id = "notifyOverlay";
+        overlay.innerHTML = `
+            <div class="card" style="width: 80%; text-align: center;">
+                <img src="File_000000009678724680189a55ffec1a9b.png" style="width:80px; margin-bottom:10px;">
+                <p style="font-size: 16px; font-weight: 600;">${msg}</p>
+                <button onclick="document.getElementById('notifyOverlay').remove()">OK</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
     }
 
     const countryPins = {
@@ -185,17 +202,11 @@
     }
 
     const langData = {
-        en: { head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", help: "GTB Help Center", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", confirm: "Confirm Transfer", close: "DONE", advisory: "<b>Security Advisory</b>Never share your PIN or password with anyone.", verifying: "Verifying...", processing: "Processing...", ref: "Ref Number", date: "Date", type: "Type", instant: "Instant Transfer" },
-        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Ke Akun", user: "ID Pengguna", pass: "PIN Akses", auth: "Masuk Aman", welcome: "Selamat Datang", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Pusat Bantuan GTB", status: "BERHASIL", receiptHead: "Resi Transaksi", confirm: "Konfirmasi Transfer", close: "SELESAI", advisory: "<b>Saran Keamanan</b>Jangan pernah membagikan PIN atau kata sandi Anda.", verifying: "Memverifikasi...", processing: "Memproses...", ref: "Nomor Ref", date: "Tanggal", type: "Tipe", instant: "Transfer Instan" },
-        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", confirm: "Sahkan Pindahan", close: "SELESAI", advisory: "<b>Nasihat Keselamatan</b>Jangan sekali-kali berkongsi PIN atau kata laluan anda.", verifying: "Mengesahkan...", processing: "Memproses...", ref: "No Rujukan", date: "Tarikh", type: "Jenis", instant: "Pindahan Segera" },
-        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Acessar Conta", user: "Usuário", pass: "PIN de Acesso", auth: "Entrada Segura", welcome: "Bem-vindo", transfer: "Transferir", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Nome do Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir Agora", help: "Centro de Ajuda GTB", status: "SUCESSO", receiptHead: "Comprovante de Transação", confirm: "Confirmar Transferência", close: "CONCLUÍDO", advisory: "<b>Aviso de Segurança</b>Nunca compartilhe sua senha ou PIN com ninguém.", verifying: "Verificando...", processing: "Processando...", ref: "Nº de Ref", date: "Data", type: "Tipo", instant: "Transferência Direta" },
-        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบ", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "เข้าสู่ระบบอย่างปลอดภัย", welcome: "ยินดีต้อนรับ", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "โอนเดี๋ยวนี้", help: "ศูนย์ช่วยเหลือ GTB", status: "สำเร็จ", receiptHead: "ใบเสร็จ", confirm: "ยืนยันการโอน", close: "เสร็จสิ้น", advisory: "<b>คำแนะนำความปลอดภัย</b>อย่าแชร์รหัสผ่านของคุณ", verifying: "กำลังตรวจสอบ...", processing: "กำลังดำเนินการ...", ref: "รหัสอ้างอิง", date: "วันที่", type: "ประเภท", instant: "โอนทันที" },
-        es: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Iniciar Sesión", user: "Usuario", pass: "PIN de Accesso", auth: "Ingreso Seguro", welcome: "Bienvenido", transfer: "Transferencia", save: "Depositar", cash: "Retirar", exit: "Salir", history: "Log de Actividad", beneficiary: "Nombre Beneficiario", accNum: "Número de Cuenta", bank: "Banco", amt: "Monto ($)", initiate: "Transferir Ahora", help: "Centro de Ajuda GTB", status: "EXITOSO", receiptHead: "Comprobante Transacción", confirm: "Confirmar Envío", close: "TERMINADO", advisory: "<b>Aviso de Seguridad</b>Nunca comparta su PIN o contraseña con terceros.", verifying: "Verificando...", processing: "Procesando...", ref: "Nº de Ref", date: "Fecha", type: "Tipo", instant: "Transferencia Inmediata" },
-        de: { head: "GLOBALE VERTRAUENSBANK", login: "Einloggen", user: "Benutzername", pass: "Zugangs-PIN", auth: "Sicherer Login", welcome: "Willkommen", transfer: "Überweisen", save: "Einzahlen", cash: "Auszahlen", exit: "Beenden", history: "Aktivitätsprotokoll", beneficiary: "Empfänger Name", accNum: "Kontonummer", bank: "Bank", amt: "Betrag ($)", initiate: "Jetzt Überweisen", help: "GTB Hilfe-Center", status: "ERFOLGREICH", receiptHead: "Transaktionsbeleg", confirm: "Überweisung Bestätigen", close: "FERTIG", advisory: "<b>Sicherheitshinweis</b>Teilen Sie niemals Ihre PIN oder Ihr Passwort mit anderen.", verifying: "Überprüfe...", processing: "Verarbeite...", ref: "Ref-Nummer", date: "Datum", type: "Typ", instant: "Echtzeit-Überweisung" },
-        fr: { head: "BANQUE DE CONFIANCE GLOBALE", login: "Connexion", user: "Nom d'utilisateur", pass: "Code PIN d'accès", auth: "Connexion Sécurisée", welcome: "Bienvenue", transfer: "Virement", save: "Déposer", cash: "Retirer", exit: "Quitter", history: "Historique d'activité", beneficiary: "Nom du Bénéficiaire", accNum: "Numéro de Compte", bank: "Banque", amt: "Montant ($)", initiate: "Transférer Maintenant", help: "Centre d'Aide GTB", status: "RÉUSSI", receiptHead: "Avis de Opération", confirm: "Confirmer le Virement", close: "TERMINÉ", advisory: "<b>Avis de Sécurité</b>Ne partagez jamais votre code PIN ou votre mot de passe.", verifying: "Vérification...", processing: "Traitement...", ref: "Nº de Réf", date: "Date", type: "Type", instant: "Virement Immédiat" },
-        it: { head: "BANCA DI FIDUCIA GLOBALE", login: "Accedi", user: "Nome utente", pass: "PIN di Accesso", auth: "Accesso Sicuro", welcome: "Benvenuto", transfer: "Bonifico", save: "Depositare", cash: "Prelevare", exit: "Esci", history: "Log Attività", beneficiary: "Nome Beneficiario", accNum: "Numero di Cuenta", bank: "Banca", amt: "Importo ($)", initiate: "Trasferisci Ora", help: "Centro Assistenza GTB", status: "RIUSCITO", receiptHead: "Ricevuta Transazione", confirm: "Conferma Bonifico", close: "FINE", advisory: "<b>Avviso di Sicurezza</b>Non condividere mai il tuo PIN o la tua password.", verifying: "Verifica...", processing: "Elaborazione...", ref: "Nº di Rif", date: "Data", type: "Tipo", instant: "Bonifico Istantaneo" },
-        jp: { head: "グローバル・トラスト・バンク", login: "サインイン", user: "ユーザー名", pass: "アクセスPIN", auth: "安全なログイン", welcome: "ようこそ", transfer: "振込", save: "預金", cash: "出金", exit: "終了", history: "取引履歴", beneficiary: "振込先名", accNum: "口座番号", bank: "銀行名", amt: "金額 ($)", initiate: "今すぐ振込", help: "GTBヘルプセンター", status: "成功", receiptHead: "取引明細書", confirm: "振込確認", close: "完了", advisory: "<b>セキュリティ警告</b>PINやパスワードを第三者に教えない de ください。", verifying: "検証中...", processing: "処理中...", ref: "照会番号", date: "日付", type: "種別", instant: "即時振込" },
-        tr: { head: "KÜRESEL GÜVEN BANKASI", login: "Giriş Yap", user: "Kullanıcı Adı", pass: "Erişim Şifresi", auth: "Güvenli Giriş", welcome: "Hoş geldiniz", transfer: "Transfer", save: "Para Yatır", cash: "Para Çek", exit: "Çıkış", history: "İşlem Geçmişi", beneficiary: "Alıcı Adı", accNum: "Hesap Numarası", bank: "Banka", amt: "Tutar ($)", initiate: "Şimdi Gönder", help: "GTB Destek Merkezi", status: "BAŞARILI", receiptHead: "İşlem Dekontu", confirm: "Transferi Onayla", close: "TAMAM", advisory: "<b>Güvenlik Uyarısı</b>Şifrenizi veya PIN kodunuzu asla kimseyle paylaşmayın.", verifying: "Doğrulanıyor...", processing: "İşleniyor...", ref: "Ref Numarası", date: "Tarih", type: "Tür", instant: "Anlık Transfer" }
+        en: { head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", help: "GTB Help Center", status: "SUCCESSFUL", receiptHead: "Transaction Receipt", confirm: "Confirm Transfer", close: "DONE", advisory: "<b>Security Advisory</b>Never share your PIN or password with anyone.", verifying: "Verifying...", processing: "Processing...", ref: "Ref Number", date: "Date", type: "Type", instant: "Instant Transfer", destination: "Destination", successMsg: (u, a, r) => `Dear ${u}, you have successfully sent $${a} to ${r}.`, selectPlaceholder: "Select Destination Country", destNames: { "United States": "United States", "Indonesia": "Indonesia", "Malaysia": "Malaysia", "Brazil": "Brazil", "Thailand": "Thailand", "Spain": "Spain", "Australia": "Australia", "Argentina": "Argentina", "Austria": "Austria", "Belize": "Belize", "Brunei": "Brunei", "Canada": "Canada", "Denmark": "Denmark", "Dominican Republic": "Dominican Republic", "Ecuador": "Ecuador", "France": "France", "Germany": "Germany", "Italy": "Italy", "Japan": "Japan", "Kuwait": "Kuwait", "Luxembourg": "Luxembourg", "Mexico": "Mexico", "Norway": "Norway", "Philippines": "Philippines", "Poland": "Poland", "Panama": "Panama", "Portugal": "Portugal", "Qatar": "Qatar", "Switzerland": "Switzerland", "Singapore": "Singapore", "Turkiye": "Turkiye", "Timor-Leste": "Timor-Leste", "United Kingdom": "United Kingdom", "Vietnam": "Vietnam" } },
+        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Ke Akun", user: "ID Pengguna", pass: "PIN Akses", auth: "Masuk Aman", welcome: "Selamat Datang", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank Tujuan", amt: "Jumlah ($)", initiate: "Kirim Sekarang", help: "Pusat Bantuan GTB", status: "BERHASIL", receiptHead: "Resi Transaksi", confirm: "Konfirmasi Transfer", close: "SELESAI", advisory: "<b>Saran Keamanan</b>Jangan pernah membagikan PIN atau kata sandi Anda.", verifying: "Memverifikasi...", processing: "Memproses...", ref: "Nomor Ref", date: "Tanggal", type: "Tipe", instant: "Transfer Instan", destination: "Tujuan", successMsg: (u, a, r) => `Yth ${u}, Anda telah berhasil mengirim $${a} kepada ${r}.`, selectPlaceholder: "Pilih Negara Tujuan", destNames: { "United States": "Amerika Serikat", "Indonesia": "Indonesia", "Malaysia": "Malaysia", "Brazil": "Brasil", "Thailand": "Thailand", "Spain": "Spanyol", "Australia": "Australia", "Argentina": "Argentina", "Austria": "Austria", "Belize": "Belize", "Brunei": "Brunei", "Canada": "Kanada", "Denmark": "Denmark", "Dominican Republic": "Republik Dominika", "Ecuador": "Ekuador", "France": "Prancis", "Germany": "Jerman", "Italy": "Italia", "Japan": "Jepang", "Kuwait": "Kuwait", "Luxembourg": "Luksemburg", "Mexico": "Meksiko", "Norway": "Norwegia", "Philippines": "Filipina", "Poland": "Polandia", "Panama": "Panama", "Portugal": "Portugal", "Qatar": "Qatar", "Switzerland": "Swiss", "Singapore": "Singapura", "Turkiye": "Turki", "Timor-Leste": "Timor Leste", "United Kingdom": "Inggris", "Vietnam": "Vietnam" } },
+        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Tunaikan", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank Penerima", amt: "Jumlah ($)", initiate: "Hantar Sekarang", help: "Pusat Bantuan GTB", status: "BERJAYA", receiptHead: "Resit Transaksi", confirm: "Sahkan Pindahan", close: "SELESAI", advisory: "<b>Nasihat Keselamatan</b>Jangan sekali-kali berkongsi PIN atau kata laluan anda.", verifying: "Mengesahkan...", processing: "Memproses...", ref: "No Rujukan", date: "Tarikh", type: "Jenis", instant: "Pindahan Segera", destination: "Destinasi", successMsg: (u, a, r) => `Yang dihormati ${u}, anda telah berjaya menghantar $${a} kepada ${r}.`, selectPlaceholder: "Pilih Negara Destinasi", destNames: { "United States": "Amerika Syarikat", "Indonesia": "Indonesia", "Malaysia": "Malaysia", "Brazil": "Brazil", "Thailand": "Thailand", "Spain": "Sepanyol", "Australia": "Australia", "Argentina": "Argentina", "Austria": "Austria", "Belize": "Belize", "Brunei": "Brunei", "Canada": "Kanada", "Denmark": "Denmark", "Dominican Republic": "Republik Dominika", "Ecuador": "Ecuador", "France": "Perancis", "Germany": "Jerman", "Italy": "Itali", "Japan": "Jepun", "Kuwait": "Kuwait", "Luxembourg": "Luxembourg", "Mexico": "Mexico", "Norway": "Norway", "Philippines": "Filipina", "Poland": "Poland", "Panama": "Panama", "Portugal": "Portugal", "Qatar": "Qatar", "Switzerland": "Switzerland", "Singapore": "Singapura", "Turkiye": "Turki", "Timor-Leste": "Timor-Leste", "United Kingdom": "United Kingdom", "Vietnam": "Vietnam" } },
+        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Acessar Conta", user: "Usuário", pass: "PIN de Acesso", auth: "Entrada Segura", welcome: "Bem-vindo", transfer: "Transferir", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Log de Atividade", beneficiary: "Nome do Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir Agora", help: "Centro de Ajuda GTB", status: "SUCESSO", receiptHead: "Comprovante de Transação", confirm: "Confirmar Transferência", close: "CONCLUÍDO", advisory: "<b>Aviso de Segurança</b>Nunca compartilhe sua senha ou PIN com ninguém.", verifying: "Verificando...", processing: "Processando...", ref: "Nº de Ref", date: "Data", type: "Tipo", instant: "Transferência Direta", destination: "Destino", successMsg: (u, a, r) => `Prezado ${u}, você enviou com sucesso $${a} para ${r}.`, selectPlaceholder: "Selecione o País de Destino", destNames: { "United States": "Estados Unidos", "Indonesia": "Indonésia", "Malaysia": "Malásia", "Brazil": "Brasil", "Thailand": "Tailândia", "Spain": "Espanha", "Australia": "Austrália", "Argentina": "Argentina", "Austria": "Áustria", "Belize": "Belize", "Brunei": "Brunei", "Canada": "Canadá", "Denmark": "Dinamarca", "Dominican Republic": "República Dominicana", "Ecuador": "Equador", "France": "França", "Germany": "Alemanha", "Italy": "Itália", "Japan": "Japão", "Kuwait": "Kuwait", "Luxembourg": "Luxemburgo", "Mexico": "México", "Norway": "Noruega", "Philippines": "Filipinas", "Poland": "Polônia", "Panama": "Panamá", "Portugal": "Portugal", "Qatar": "Catar", "Switzerland": "Suíça", "Singapore": "Singapura", "Turkiye": "Turquia", "Timor-Leste": "Timor-Leste", "United Kingdom": "Reino Unido", "Vietnam": "Vietnã" } },
+        th: { head: "ธนาคารความร่วมมือระดับโลก", login: "เข้าสู่ระบบ", user: "ชื่อผู้ใช้", pass: "รหัสผ่าน", auth: "เข้าสู่ระบบอย่างปลอดภัย", welcome: "ยินดีต้อนรับ", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออกจากระบบ", history: "ประวัติกิจกรรม", beneficiary: "ชื่อผู้รับ", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "โอนเดี๋ยวนี้", help: "ศูนย์ช่วยเหลือ GTB", status: "สำเร็จ", receiptHead: "ใบเสร็จ", confirm: "ยืนยันการโอน", close: "เสร็จสิ้น", advisory: "<b>คำแนะนำความปลอดภัย</b>อย่าแชร์รหัสผ่านของคุณ", verifying: "กำลังตรวจสอบ...", processing: "กำลังดำเนินการ...", ref: "รหัสอ้างอิง", date: "วันที่", type: "ประเภท", instant: "โอนทันที", destination: "ปลายทาง", successMsg: (u, a, r) => `เรียน ${u} คุณได้โอนเงินจำนวน $${a} ให้แก่ ${r} เรียบร้อยแล้ว`, selectPlaceholder: "เลือกประเทศปลายทาง", destNames: { "United States": "สหรัฐอเมริกา", "Indonesia": "อินโดนีเซีย", "Malaysia": "มาเลเซีย", "Brazil": "บราซิล", "Thailand": "ไทย", "Spain": "สเปน", "Australia": "ออสเตรเลีย", "Argentina": "อาร์เจนตินา", "Austria": "ออสเตรีย", "Belize": "เบลีซ", "Brunei": "บรูไน", "Canada": "แคนาดา", "Denmark": "เดนมาร์ก", "Dominican Republic": "สาธารณรัฐโดมินิกัน", "Ecuador": "เอกวาดอร์", "France": "ฝรั่งเศส", "Germany": "เยอรมนี", "Italy": "อิตาลี", "Japan": "ญี่ปุ่น", "Kuwait": "คูเวต", "Luxembourg": "ลักเซมเบิร์ก", "Mexico": "เม็กซิโก", "Norway": "นอร์เวย์", "Philippines": "ฟิลิปปินส์", "Poland": "โปแลนด์", "Panama": "ปานามา", "Portugal": "โปรตุเกส", "Qatar": "กาตาร์", "Switzerland": "สวิตเซอร์แลนด์", "Singapore": "สิงคโปร์", "Turkiye": "ตุรกี", "Timor-Leste": "ติมอร์-เลสเต", "United Kingdom": "สหราชอาณาจักร", "Vietnam": "เวียดนาม" } }
     };
 
     function getTranslationDictionary(countryCode) {
@@ -216,6 +227,28 @@
         setLanguage();
     }
 
+    function updateTransferSelector() {
+        const c = document.getElementById("language").value;
+        const d = getTranslationDictionary(c);
+        const tSelector = document.getElementById("transferCountry");
+        const placeholder = document.getElementById("selectPlaceholder");
+        
+        placeholder.innerText = d.selectPlaceholder;
+        
+        // Remove old dynamic options
+        while (tSelector.options.length > 1) {
+            tSelector.remove(1);
+        }
+        
+        countryDropdownOptions.forEach(opt => {
+            const el = document.createElement("option");
+            const translatedName = d.destNames[opt.name] || opt.name;
+            el.value = translatedName;
+            el.innerText = translatedName;
+            tSelector.appendChild(el);
+        });
+    }
+
     function setLanguage() {
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
@@ -225,6 +258,7 @@
         document.getElementById("password").placeholder = d.pass;
         document.getElementById("loginBtn").innerText = d.auth;
         document.getElementById("securityBanner").innerHTML = d.advisory;
+        updateTransferSelector();
     }
 
     window.onload = loadDropdownOptions;
@@ -238,11 +272,8 @@
         if(inputPin === correctPin) {
             loggedInUser = document.getElementById("username").value || "Valued Client";
             showLoadingOverlay(d.verifying);
-            
             setTimeout(() => {
                 removeLoadingOverlay();
-                
-                // Show profile splash screen
                 const splash = document.createElement("div");
                 splash.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;";
                 splash.innerHTML = `
@@ -250,7 +281,6 @@
                     <p style="font-size:24px; font-weight:600; color:#1e293b;">${d.welcome}, ${loggedInUser}</p>
                 `;
                 document.body.appendChild(splash);
-
                 setTimeout(() => {
                     splash.remove();
                     document.getElementById("login").classList.add("hidden");
@@ -259,7 +289,7 @@
                     document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     applyDashboardLang();
                     loadHistory();
-                }, 3000); // Stays for 3 seconds
+                }, 3000); 
             }, 2500); 
         } else { alert("Invalid PIN for this region."); }
     }
@@ -332,13 +362,14 @@
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
         const r = document.getElementById("receiver").value;
+        const country = document.getElementById("transferCountry").value;
         const a_val = document.getElementById("amount").value;
         const a_numeric = parseFloat(a_val.replace(/,/g, ''));
-        if(!r || isNaN(a_numeric)) { alert("Check details"); return; }
-        document.getElementById("transferPreview").innerHTML = `<div class="card" style="margin-top:10px; background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small><input type="password" id="tPin" placeholder="${d.pass}"><button id="finalConfirmBtn" onclick="finishTransfer(${a_numeric},'${r}')" style="background:#0f172a">${d.auth}</button></div>`;
+        if(!r || !country || isNaN(a_numeric)) { alert("Check details"); return; }
+        document.getElementById("transferPreview").innerHTML = `<div class="card" style="margin-top:10px; background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small><br><small>To: ${country}</small><input type="password" id="tPin" placeholder="${d.pass}"><button id="finalConfirmBtn" onclick="finishTransfer(${a_numeric},'${r}','${country}')" style="background:#0f172a">${d.auth}</button></div>`;
     }
 
-    function finishTransfer(amt, name) {
+    function finishTransfer(amt, name, country) {
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
         if(document.getElementById("tPin").value !== transferPin) { alert("Invalid PIN"); return; }
@@ -354,17 +385,20 @@
             li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
             document.getElementById("history").prepend(li);
             document.getElementById("transferBox").classList.add("hidden");
-            generateRealReceipt(name, amt, now);
+            
+            showNotification(d.successMsg(loggedInUser, amt.toLocaleString(), name));
+            
+            generateRealReceipt(name, amt, now, country);
         }, 3000); 
     }
 
-    function generateRealReceipt(name, amt, timestampObj) {
+    function generateRealReceipt(name, amt, timestampObj, country) {
         const c = document.getElementById("language").value;
         const d = getTranslationDictionary(c);
         const rBox = document.getElementById("receiptBox");
         const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
         rBox.classList.remove("hidden");
-        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:45px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:45px; margin-bottom:8px;"><br><strong>GLOBAL TRUST BANK</strong><br><small>${d.receiptHead}</small></div><div class="receipt-body"><center><div class="success-badge">✔ ${d.status}</div><div style="font-size:28px; font-weight:800; color:#1e293b; margin-bottom:20px;">$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></center><div class="receipt-row"><span>${d.beneficiary}</span><b>${name}</b></div><div class="receipt-row"><span>${d.destination}</span><b>${country}</b></div><div class="receipt-row"><span>${d.date}</span><b>${getFormattedDateTime(timestampObj)}</b></div><div class="receipt-row"><span>${d.ref}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.type}</span><b>${d.instant}</b></div><button onclick="this.parentElement.parentElement.classList.add('hidden')" style="margin-top:20px; background:#f1f5f9; color:#475569;">${d.close}</button></div><div class="receipt-footer">Automated receipt. Verified via GTN Security.</div></div>`;
     }
 
     function toggleBalance() {
