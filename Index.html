@@ -96,7 +96,7 @@
             </select>
             <input id="bank" placeholder="Bank">
             <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)">
-            <button onclick="preTransfer()" id="btnInitiate">Transfer Now</button>
+            <button type="button" onclick="preTransfer()" id="btnInitiate">Transfer Now</button>
             <div id="transferPreview"></div>
         </div>
 
@@ -625,7 +625,7 @@
     function preTransfer() {
         const c = selectedLanguageCode;
         const d = getTranslationDictionary(c);
-        const r = document.getElementById("receiver").value;
+        const r = document.getElementById("receiver").value.trim();
         const country = document.getElementById("transferCountry").value;
         const a_val = document.getElementById("amount").value;
         const a_numeric = parseFloat(a_val.replace(/,/g, ''));
@@ -640,13 +640,26 @@
             return;
         }
         
-        document.getElementById("transferPreview").innerHTML = `
-            <div class="card" style="margin-top:10px; background:#f8fafc">
-                <small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small>
-                <input type="password" id="tPin" placeholder="Transfer PIN" style="margin-top:10px;">
-                <button onclick="finishTransfer(${a_numeric}, '${r}', '${country}')" style="margin-top:10px;">${d.initiate}</button>
-            </div>
-        `;
+        const preview = document.getElementById("transferPreview");
+        const confirmationCard = document.createElement("div");
+        const confirmationText = document.createElement("small");
+        const pinInput = document.createElement("input");
+        const confirmButton = document.createElement("button");
+
+        confirmationCard.className = "card";
+        confirmationCard.style.cssText = "margin-top:10px; background:#f8fafc";
+        confirmationText.textContent = `${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        pinInput.type = "password";
+        pinInput.id = "tPin";
+        pinInput.placeholder = "Transfer PIN";
+        pinInput.style.marginTop = "10px";
+        confirmButton.type = "button";
+        confirmButton.textContent = d.initiate;
+        confirmButton.style.marginTop = "10px";
+        confirmButton.addEventListener("click", () => finishTransfer(a_numeric, r, country));
+
+        confirmationCard.append(confirmationText, pinInput, confirmButton);
+        preview.replaceChildren(confirmationCard);
     }
 
     function finishTransfer(amt, name, country) {
