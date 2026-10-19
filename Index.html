@@ -1,514 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Global Trust Bank | Private Wealth</title>
     <style>
-        :root { --primary: #4f46e5; --dark-bg: #071033; --card-bg: #ffffff; --text-main: #0f172a; --success: #16a34a; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; margin: 0; background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); color: var(--text-main); }
-        .header { background: linear-gradient(90deg, var(--dark-bg), #0b1a3a); color: white; padding: 18px 20px; text-align: center; font-size: 18px; font-weight: 700; border-bottom: 4px solid var(--primary); display:flex; align-items:center; justify-content:center; gap:12px; }
-        .header img { height:36px; width:36px; object-fit:contain; }
-        .container { max-width: 920px; margin: 28px auto; padding: 16px; display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
-        .card { background: var(--card-bg); border-radius: 14px; padding: 20px; margin-top: 0; box-shadow: 0 10px 25px -10px rgba(2,6,23,0.12); }
-        .hidden { display: none; }
-
-        .login-brand { text-align: center; margin-bottom: 14px; }
-        .login-brand img { width: 110px; height:110px; object-fit:cover; border-radius: 8px; }
-        .security-banner { background: #f1f5ff; border-left: 4px solid var(--primary); padding: 12px; border-radius: 8px; font-size: 12px; color: #1e293b; margin-bottom: 12px; line-height: 1.4; }
-        .security-banner b { display: block; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
-
-        input, select, button { width: 100%; padding: 12px 14px; margin-top: 10px; border-radius: 10px; border: 1px solid #e6eefb; font-size: 15px; outline: none; transition: 0.15s; background: white; }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 6px 18px rgba(79,70,229,0.07); }
-        button { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 12px; }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        .balanceCard { background: linear-gradient(135deg, #0b1220, #142238); color: white; border-radius: 14px; padding: 20px; position: relative; }
-        .balance { font-size: 36px; font-weight: 800; }
-        .eye { position: absolute; right: 18px; top: 18px; cursor: pointer; font-size: 20px; user-select: none; }
-
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
-        .action-icon { background: white; padding: 12px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content:center; cursor: pointer; border: 1px solid #eef2ff; }
-        .action-icon img { width: 26px; height: 26px; margin-bottom: 8px; }
-
-        #history { list-style: none; padding: 0; margin: 0; }
-        #history li { padding: 12px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 13px; }
-
-        .receipt-container { background: white; border-radius: 12px; padding: 0; overflow: hidden; border: 1px solid #e8eefc; box-shadow: 0 16px 30px rgba(2,6,23,0.06); }
-        .receipt-header { background: #fbfdff; padding: 22px; text-align: center; border-bottom: 1px dashed #e6eefb; }
-        .receipt-body { padding: 18px; font-size: 14px; }
-        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f8fafc; }
-        .receipt-row span { color: #64748b; font-weight: 500; }
-        .receipt-row b { color: #0f172a; text-align: right; }
-        .success-badge { background: #ecfdf5; color: #065f46; padding: 6px 12px; border-radius: 14px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px; border: 1px solid #bbf7d0; }
-        .receipt-footer { padding: 12px; background: #fbfdff; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.4; border-top: 1px solid #f1f5f9; }
-
-        .helpBtn { margin-top: 18px; background: var(--dark-bg); color: white; border-radius: 12px; padding: 12px; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap:8px; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .notification-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .container { grid-template-columns: 1fr; padding: 12px; }
-        }
+        :root{--primary:#4f46e5;--dark-bg:#071033;--card-bg:#fff;--text:#0f172a}
+        *{box-sizing:border-box}
+        body{font-family:Inter, 'Segoe UI', Roboto, Arial, sans-serif;margin:0;background:linear-gradient(180deg,#f8fafc 0,#eef2ff 100%);color:var(--text)}
+        .header{display:flex;align-items:center;gap:12px;justify-content:center;padding:16px 20px;background:linear-gradient(90deg,var(--dark-bg),#0b1a3a);color:#fff;border-bottom:4px solid var(--primary);font-weight:700}
+        .header img{height:36px;width:36px;object-fit:contain}
+        .container{max-width:920px;margin:28px auto;padding:16px;display:grid;grid-template-columns:360px 1fr;gap:24px}
+        .card{background:var(--card-bg);border-radius:12px;padding:18px;box-shadow:0 10px 25px -10px rgba(2,6,23,.08)}
+        .hidden{display:none}
+        .login-brand{text-align:center;margin-bottom:12px}
+        .login-brand img{width:110px;height:110px;object-fit:cover;border-radius:8px}
+        .security-banner{background:#f1f5ff;border-left:4px solid var(--primary);padding:12px;border-radius:8px;margin-bottom:12px;font-size:13px;color:#1e293b}
+        input,select,button{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #e6eefb;font-size:15px;background:#fff}
+        input:focus,select:focus{outline:none;box-shadow:0 6px 18px rgba(79,70,229,.06);border-color:var(--primary)}
+        button{background:var(--primary);color:#fff;border:none;font-weight:700;cursor:pointer;text-transform:none;padding:12px}
+        .balanceCard{background:linear-gradient(135deg,#0b1220,#142238);color:#fff;border-radius:12px;padding:18px;position:relative}
+        .balance{font-size:34px;font-weight:800}
+        .eye{position:absolute;right:16px;top:16px;cursor:pointer;font-size:20px}
+        .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+        .action-icon{background:#fff;border-radius:10px;padding:12px;border:1px solid #eef2ff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700}
+        .action-icon img{width:26px;height:26px;margin-bottom:8px}
+        #history{list-style:none;padding:0;margin:0}
+        #history li{padding:12px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;font-size:13px}
+        .receipt-container{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e8eefc}
+        .receipt-header{background:#fbfdff;padding:18px;text-align:center;border-bottom:1px dashed #e6eefb}
+        .receipt-body{padding:14px}
+        .receipt-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8fafc}
+        .receipt-row span{color:#64748b}
+        .receipt-footer{padding:12px;background:#fbfdff;color:#94a3b8;text-align:center}
+        .helpBtn{margin-top:16px;background:var(--dark-bg);color:#fff;border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+        @media(max-width:900px){.container{grid-template-columns:1fr;padding:12px}}
     </style>
 </head>
 <body>
 
-<div class="header" id="mainHeader"><img src="File_000000009678724680189a55ffec1a9b.png" alt="logo"> <span style="letter-spacing:0.6px">GLOBAL TRUST BANK</span></div>
+<div class="header" id="mainHeader"><img src="File_000000009678724680189a55ffec1a9b.png" alt="GTB logo"><span>GLOBAL TRUST BANK</span></div>
 
 <div class="container">
-    <!-- Left column: login / controls -->
+    <!-- Left: Login -->
     <div>
         <div id="login" class="card">
             <div class="login-brand">
-                <img src="File_000000009678724680189a55ffec1a9b.png" alt="Bank Logo">
-                <h3 id="loginTitle" style="margin:8px 0 0; font-size: 20px; color: var(--text-main);">Sign In</h3>
+                <img src="File_000000009678724680189a55ffec1a9b.png" alt="Bank logo">
+                <h3 id="loginTitle" style="margin:8px 0 0;font-size:18px">Sign in</h3>
             </div>
+
             <div id="securityBanner" class="security-banner"></div>
 
             <select id="language" onchange="setLanguage()"></select>
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Access PIN">
-            <!-- Optional gender override (hidden by default) but available for user control -->
-            <select id="genderOverride" style="margin-top:8px; display:none;">
-                <option value="">Auto-detect gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+
+            <!-- Visible salutation selector so user chooses gender/title before login -->
+            <select id="genderOverride" style="margin-top:10px">
+                <option value="">Auto-detect title</option>
+                <option value="male">Mr.</option>
+                <option value="female">Ms.</option>
                 <option value="other">Prefer not to say</option>
             </select>
 
-            <button id="loginBtn" onclick="doLogin()">Secure Login</button>
-            <small style="display:block; margin-top:12px; color:#64748b">Tip: If greeting is incorrect you can set your preferred title after logging in.</small>
+            <input type="text" id="username" placeholder="Username" style="margin-top:10px">
+            <input type="password" id="password" placeholder="Access PIN" style="margin-top:10px">
+
+            <button id="loginBtn" onclick="doLogin()" style="margin-top:12px">Sign in securely</button>
+            <small style="display:block;margin-top:10px;color:#64748b">This demo shows a secure sign-in flow — never share your PIN.</small>
         </div>
 
-        <div class="card" style="margin-top:16px;">
-            <h4 style="margin:0 0 10px 0">About</h4>
-            <p style="margin:0; color:#475569; font-size:14px">Global Trust Bank demo dashboard. Translations, transfers and receipts are functional in this demo. Your profile photo will not be shown in the account view — only the bank logo is displayed for privacy.</p>
+        <div class="card" style="margin-top:16px">
+            <h4 style="margin:0 0 10px 0">About this demo</h4>
+            <p style="margin:0;color:#475569;line-height:1.4">For privacy the dashboard displays only the bank logo. You select your title during sign in; transfers and receipts are functional in this demo. Replace demo pins with a real auth backend for production.</p>
         </div>
-
     </div>
 
-    <!-- Right column: dashboard -->
+    <!-- Right: Dashboard -->
     <div>
         <div id="dashboard" class="hidden">
             <div class="card balanceCard">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
-                    <img src="File_000000009678724680189a55ffec1a9b.png" alt="Bank Logo" style="width:64px; height:64px; object-fit:cover; border-radius:8px; background:white; padding:6px;">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+                    <img src="File_000000009678724680189a55ffec1a9b.png" alt="Bank logo" style="width:64px;height:64px;object-fit:cover;border-radius:8px;background:#fff;padding:6px">
                     <div>
-                        <div id="greetingText" style="font-size:16px; font-weight:700;">Welcome</div>
-                        <div id="subGreeting" style="font-size:13px; opacity:0.75;">Private Wealth • 4402-****-9921</div>
+                        <div id="greetingText" style="font-size:16px;font-weight:700">Welcome</div>
+                        <div id="subGreeting" style="font-size:13px;opacity:.8">Private Wealth • 4402-****-9921</div>
                     </div>
                 </div>
                 <div class="balance" id="balance">$590,000.75</div>
                 <div id="eyeIcon" class="eye" onclick="toggleBalance()">👁️</div>
             </div>
 
-            <div class="grid" style="margin-top:14px;">
-                <div class="action-icon" onclick="showBox('transferBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/forward-arrow.png"><span id="navTransfer">Transfer</span></div>
-                <div class="action-icon" onclick="showBox('depositBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/plus.png"><span id="navDeposit">Save</span></div>
-                <div class="action-icon" onclick="showBox('withdrawBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/minus.png"><span id="navWithdraw">Cash</span></div>
-                <div class="action-icon" onclick="logout()"><img src="https://img.icons8.com/ios-filled/50/4f46e5/shutdown.png"><span id="navExit">Exit</span></div>
+            <div class="grid" style="margin-top:12px">
+                <div class="action-icon" onclick="showBox('transferBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/forward-arrow.png"><div id="navTransfer">Transfer</div></div>
+                <div class="action-icon" onclick="showBox('depositBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/plus.png"><div id="navDeposit">Deposit</div></div>
+                <div class="action-icon" onclick="showBox('withdrawBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/minus.png"><div id="navWithdraw">Withdraw</div></div>
+                <div class="action-icon" onclick="logout()"><img src="https://img.icons8.com/ios-filled/50/4f46e5/shutdown.png"><div id="navExit">Sign out</div></div>
             </div>
 
-            <div id="transferBox" class="card hidden">
+            <div id="transferBox" class="card hidden" style="margin-top:14px">
                 <h4 id="tTitle">Funds Transfer</h4>
-                <input id="receiver" placeholder="Beneficiary Name">
-                <input id="accountNum" placeholder="Account Number">
-                <select id="transferCountry">
-                    <option value="" id="selectPlaceholder" disabled selected>Select Destination Country</option>
+                <input id="receiver" placeholder="Beneficiary name">
+                <input id="accountNum" placeholder="Account number" style="margin-top:10px">
+                <select id="transferCountry" style="margin-top:10px">
+                    <option value="" id="selectPlaceholder" disabled selected>Select destination country</option>
                 </select>
-                <input id="bank" placeholder="Bank">
-                <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)">
-                <button onclick="preTransfer()" id="btnInitiate">Transfer Now</button>
+                <input id="bank" placeholder="Bank" style="margin-top:10px">
+                <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)" style="margin-top:10px">
+                <button onclick="preTransfer()" id="btnInitiate" style="margin-top:10px">Initiate transfer</button>
                 <div id="transferPreview"></div>
             </div>
 
-            <div id="receiptBox" class="card hidden" style="padding: 0; background: transparent; box-shadow: none;"></div>
+            <div id="receiptBox" class="card hidden" style="margin-top:14px;padding:0;background:transparent;box-shadow:none"></div>
 
-            <div class="card" style="margin-top:12px;">
-                <h4 id="hTitle">Activity Log</h4>
+            <div class="card" style="margin-top:14px">
+                <h4 id="hTitle">Activity log</h4>
                 <ul id="history"></ul>
             </div>
 
-            <button class="helpBtn" onclick="window.open('https://wa.me/12792843484')">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/info.png"/> <span id="helpText">GTB Help Center</span>
-            </button>
+            <button class="helpBtn" onclick="window.open('https://wa.me/12792843484')"><img src="https://img.icons8.com/ios-filled/24/ffffff/info.png" alt="help"> <span id="helpText">GTB Help Center</span></button>
         </div>
     </div>
 </div>
 
 <script>
+    // Demo state
     let balance = 590000.75;
-    const transferPin = "2468";
-    let balanceHidden = false;
-    let loggedInUser = "";
-    let selectedLanguageCode = "";
-    let detectedGender = ""; // 'male' | 'female' | 'other'
+    const transferPin = '2468'; // demo transfer PIN
+    let balanceHidden = true; // keep balance hidden until user chooses to reveal
+    let loggedInUser = '';
+    let selectedLanguageCode = '';
+    let detectedGender = '';
 
-    // Timezone mapping for countries (kept from original)
-    const countryTimezones = {
-        en: 'America/New_York', id: 'Asia/Jakarta', ms: 'Asia/Kuala_Lumpur', pt: 'America/Sao_Paulo', th: 'Asia/Bangkok',
-        es: 'Europe/Madrid', de: 'Europe/Berlin', ar: 'Asia/Riyadh', fr: 'Europe/Paris', it: 'Europe/Rome', ja: 'Asia/Tokyo',
-        da: 'Europe/Copenhagen', no: 'Europe/Oslo', fil: 'Asia/Manila', pl: 'Europe/Warsaw', tr: 'Europe/Istanbul', tet: 'Asia/Dili',
-        vi: 'Asia/Ho_Chi_Minh', gb: 'Europe/London'
-    };
+    const countryTimezones = { en:'America/New_York', id:'Asia/Jakarta', ms:'Asia/Kuala_Lumpur', pt:'America/Sao_Paulo', th:'Asia/Bangkok', es:'Europe/Madrid', de:'Europe/Berlin', ar:'Asia/Riyadh', fr:'Europe/Paris', it:'Europe/Rome', ja:'Asia/Tokyo', da:'Europe/Copenhagen', no:'Europe/Oslo', fil:'Asia/Manila', pl:'Europe/Warsaw', tr:'Europe/Istanbul', tet:'Asia/Dili', vi:'Asia/Ho_Chi_Minh', gb:'Europe/London' };
 
-    function showLoadingOverlay(message) {
-        const overlay = document.createElement("div");
-        overlay.className = "loading-overlay";
-        overlay.id = "activeOverlay";
-        overlay.innerHTML = `<img src="File_000000009678724680189a55ffec1a9b.png" style="width:110px; border-radius:12px; margin-bottom:18px;"><p style="margin-top:20px; font-weight:700; color:#0f172a;">${message}</p>`;
-        document.body.appendChild(overlay);
-    }
-
-    function removeLoadingOverlay() {
-        const el = document.getElementById("activeOverlay");
-        if (el) el.remove();
-    }
-
-    function showNotification(msg) {
-        const overlay = document.createElement("div");
-        overlay.className = "notification-overlay";
-        overlay.id = "notifyOverlay";
-        overlay.innerHTML = `
-            <div class="card" style="width: 88%; max-width:420px; text-align: center;">
-                <img src="File_000000009678724680189a55ffec1a9b.png" style="width:72px; margin-bottom:12px; border-radius:12px; object-fit:cover;">
-                <p style="font-size: 15px; font-weight: 700;">${msg}</p>
-                <button onclick="document.getElementById('notifyOverlay').remove()" style="margin-top:12px;">OK</button>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-    }
-
-    const countryPins = {
-        en: "444111", id: "444222", ms: "444333", pt: "444555", th: "444666",
-        es: "444777", de: "444888", ar: "444999", fr: "555111", it: "555222",
-        ja: "555333", da: "555555", pl: "555666", no: "666666",
-        fil: "666777", tr: "555999", tet: "666222", vi: "666111", gb: "777777"
-    };
+    // demo country PINs (for login demo only)
+    const countryPins = { en:'444111', id:'444222', ms:'444333', pt:'444555', th:'444666', es:'444777', de:'444888', ar:'444999', fr:'555111', it:'555222', ja:'555333', da:'555555', pl:'555666', no:'666666', fil:'666777', tr:'555999', tet:'666222', vi:'666111', gb:'777777' };
 
     const countryDropdownOptions = [
-        { code: "en", flag: "🇺🇸", name: "United States", langCode: "en" },
-        { code: "id", flag: "🇮🇩", name: "Indonesia", langCode: "id" },
-        { code: "ms", flag: "🇲🇾", name: "Malaysia", langCode: "ms" },
-        { code: "pt", flag: "🇧🇷", name: "Brazil", langCode: "pt" },
-        { code: "th", flag: "🇹🇭", name: "Thailand", langCode: "th" },
-        { code: "es", flag: "🇪🇸", name: "Spain", langCode: "es" },
-        { code: "en", flag: "🇦🇺", name: "Australia", langCode: "en" },
-        { code: "es", flag: "🇦🇷", name: "Argentina", langCode: "es" },
-        { code: "de", flag: "🇦🇹", name: "Austria", langCode: "de" },
-        { code: "en", flag: "🇧🇿", name: "Belize", langCode: "en" },
-        { code: "ms", flag: "🇧🇳", name: "Brunei", langCode: "ms" },
-        { code: "en", flag: "🇨🇦", name: "Canada", langCode: "en" },
-        { code: "da", flag: "🇩🇰", name: "Denmark", langCode: "da" },
-        { code: "es", flag: "🇩🇴", name: "Dominican Republic", langCode: "es" },
-        { code: "es", flag: "🇪🇨", name: "Ecuador", langCode: "es" },
-        { code: "fr", flag: "🇫🇷", name: "France", langCode: "fr" },
-        { code: "de", flag: "🇩🇪", name: "Germany", langCode: "de" },
-        { code: "it", flag: "🇮🇹", name: "Italy", langCode: "it" },
-        { code: "ja", flag: "🇯🇵", name: "Japan", langCode: "ja" },
-        { code: "ar", flag: "🇰🇼", name: "Kuwait", langCode: "ar" },
-        { code: "fr", flag: "🇱🇺", name: "Luxembourg", langCode: "fr" },
-        { code: "es", flag: "🇲🇽", name: "Mexico", langCode: "es" },
-        { code: "no", flag: "🇳🇴", name: "Norway", langCode: "no" },
-        { code: "fil", flag: "🇵🇭", name: "Philippines", langCode: "fil" },
-        { code: "pl", flag: "🇵🇱", name: "Poland", langCode: "pl" },
-        { code: "es", flag: "🇵🇦", name: "Panama", langCode: "es" },
-        { code: "pt", flag: "🇵🇹", name: "Portugal", langCode: "pt" },
-        { code: "ar", flag: "🇶🇦", name: "Qatar", langCode: "ar" },
-        { code: "de", flag: "🇨🇭", name: "Switzerland", langCode: "de" },
-        { code: "en", flag: "🇸🇬", name: "Singapore", langCode: "en" },
-        { code: "tr", flag: "🇹🇷", name: "Turkiye", langCode: "tr" },
-        { code: "tet", flag: "🇹🇱", name: "Timor-Leste", langCode: "tet" },
-        { code: "gb", flag: "🇬🇧", name: "United Kingdom", langCode: "gb" },
-        { code: "vi", flag: "🇻🇳", name: "Vietnam", langCode: "vi" }
+        {code:'en',flag:'🇺🇸',name:'United States',langCode:'en'},
+        {code:'id',flag:'🇮🇩',name:'Indonesia',langCode:'id'},
+        {code:'ms',flag:'🇲🇾',name:'Malaysia',langCode:'ms'},
+        {code:'pt',flag:'🇧🇷',name:'Brazil',langCode:'pt'},
+        {code:'th',flag:'🇹🇭',name:'Thailand',langCode:'th'},
+        {code:'es',flag:'🇪🇸',name:'Spain',langCode:'es'},
+        {code:'en',flag:'🇦🇺',name:'Australia',langCode:'en'},
+        {code:'es',flag:'🇦🇷',name:'Argentina',langCode:'es'},
+        {code:'de',flag:'🇦🇹',name:'Austria',langCode:'de'},
+        {code:'en',flag:'🇧🇿',name:'Belize',langCode:'en'},
+        {code:'ms',flag:'🇧🇳',name:'Brunei',langCode:'ms'},
+        {code:'en',flag:'🇨🇦',name:'Canada',langCode:'en'},
+        {code:'da',flag:'🇩🇰',name:'Denmark',langCode:'da'},
+        {code:'es',flag:'🇩🇴',name:'Dominican Republic',langCode:'es'},
+        {code:'es',flag:'🇪🇨',name:'Ecuador',langCode:'es'},
+        {code:'fr',flag:'🇫🇷',name:'France',langCode:'fr'},
+        {code:'de',flag:'🇩🇪',name:'Germany',langCode:'de'},
+        {code:'it',flag:'🇮🇹',name:'Italy',langCode:'it'},
+        {code:'ja',flag:'🇯🇵',name:'Japan',langCode:'ja'},
+        {code:'ar',flag:'🇰🇼',name:'Kuwait',langCode:'ar'},
+        {code:'fr',flag:'🇱🇺',name:'Luxembourg',langCode:'fr'},
+        {code:'es',flag:'🇲🇽',name:'Mexico',langCode:'es'},
+        {code:'no',flag:'🇳🇴',name:'Norway',langCode:'no'},
+        {code:'fil',flag:'🇵🇭',name:'Philippines',langCode:'fil'},
+        {code:'pl',flag:'🇵🇱',name:'Poland',langCode:'pl'},
+        {code:'es',flag:'🇵🇦',name:'Panama',langCode:'es'},
+        {code:'pt',flag:'🇵🇹',name:'Portugal',langCode:'pt'},
+        {code:'ar',flag:'🇶🇦',name:'Qatar',langCode:'ar'},
+        {code:'de',flag:'🇨🇭',name:'Switzerland',langCode:'de'},
+        {code:'en',flag:'🇸🇬',name:'Singapore',langCode:'en'},
+        {code:'tr',flag:'🇹🇷',name:'Turkiye',langCode:'tr'},
+        {code:'tet',flag:'🇹🇱',name:'Timor-Leste',langCode:'tet'},
+        {code:'gb',flag:'🇬🇧',name:'United Kingdom',langCode:'gb'},
+        {code:'vi',flag:'🇻🇳',name:'Vietnam',langCode:'vi'}
     ];
 
-    function formatCurrency(input) {
-        let value = input.value.replace(/[^0-9.]/g, '');
-        if (value === "") { input.value = ""; return; }
-        let parts = value.split('.');
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        input.value = parts.join('.');
-    }
-
-    // language data (abbreviated for brevity but kept keys used)
+    // Minimal translation dictionary (falls back to English)
     const langData = {
-        en: {
-            head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome",
-            transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log",
-            beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now",
-            verifying: "Verifying your credentials...", processing: "Processing transfer...", confirm: "Confirm amount", selectPlaceholder: "Select Destination Country",
-            advisory: "<b>Security Notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN by message.",
-            receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:",
-            successMsg: (user, amt, name) => `Transfer of $${amt} to ${name} successful!`, insufficientBalance: "Insufficient Balance", insufficientMsg: "You do not have enough balance to complete this transfer.",
-            help: "GTB Help Center", destNames: {}
-        }
-        // For brevity other languages will fallback to English in this demo (original file had many languages)
+        en:{head:'GLOBAL TRUST BANK',login:'Sign in',user:'Username',pass:'Access PIN',auth:'Sign in securely',transfer:'Transfer',save:'Deposit',cash:'Withdraw',exit:'Sign out',history:'Activity log',beneficiary:'Beneficiary name',accNum:'Account number',bank:'Bank',amt:'Amount ($)',initiate:'Initiate transfer',verifying:'Verifying your credentials...',processing:'Processing transfer...',confirm:'Confirm amount',selectPlaceholder:'Select destination country',advisory:'<b>Security notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN by message.',receiptTitle:'TRANSFER RECEIPT',receiptSuccess:'TRANSFER SUCCESSFUL',receiptRefNum:'Reference Number:',receiptDate:'Date:',receiptTime:'Time:',receiptFrom:'From:',receiptTo:'To:',successMsg:(user,amt,name)=>`Transfer of $${amt} to ${name} successful!`,insufficientBalance:'Insufficient Balance',insufficientMsg:'You do not have enough balance to complete this transfer.',help:'GTB Help Center',destNames:{} }
     };
 
-    function getTranslationDictionary(countryCode) {
-        if (langData[countryCode]) return langData[countryCode];
-        return langData['en'];
+    function getTranslationDictionary(countryCode){return langData[countryCode]||langData['en']}
+
+    function loadDropdownOptions(){
+        const sel=document.getElementById('language');
+        sel.innerHTML='<option value="" disabled selected style="color:#94a3b8">Select language</option>';
+        countryDropdownOptions.forEach(opt=>{const el=document.createElement('option');el.value=opt.langCode;el.innerText=`${opt.flag} ${opt.name}`;sel.appendChild(el)});
     }
 
-    function getConnector(countryCode) { return 'to'; }
-
-    function loadDropdownOptions() {
-        const selector = document.getElementById("language");
-        selector.innerHTML = '<option value="" disabled selected style="color: #94a3b8;">Select Language</option>';
-        countryDropdownOptions.forEach(opt => {
-            const el = document.createElement("option");
-            el.value = opt.langCode;
-            el.innerText = `${opt.flag} ${opt.name}`;
-            selector.appendChild(el);
-        });
+    function updateTransferSelector(){
+        const c=document.getElementById('language').value;const d=getTranslationDictionary(c);const t=document.getElementById('transferCountry');const placeholder=document.getElementById('selectPlaceholder');if(placeholder)placeholder.innerText=d.selectPlaceholder||'Select destination country';while(t.options.length>1)t.remove(1);countryDropdownOptions.forEach(opt=>{const el=document.createElement('option');const translated=(d.destNames&&d.destNames[opt.name])?d.destNames[opt.name]:opt.name;el.value=translated;el.innerText=translated;t.appendChild(el)})
     }
 
-    function updateTransferSelector() {
-        const c = document.getElementById("language").value;
-        const d = getTranslationDictionary(c);
-        const tSelector = document.getElementById("transferCountry");
-        const placeholder = document.getElementById("selectPlaceholder");
-        placeholder.innerText = d.selectPlaceholder || 'Select Destination Country';
-        while (tSelector.options.length > 1) { tSelector.remove(1); }
-        countryDropdownOptions.forEach(opt => {
-            const el = document.createElement("option");
-            const translatedName = d.destNames && d.destNames[opt.name] ? d.destNames[opt.name] : opt.name;
-            el.value = translatedName;
-            el.innerText = translatedName;
-            tSelector.appendChild(el);
-        });
-    }
+    function setLanguage(){const c=document.getElementById('language').value;if(!c)return;selectedLanguageCode=c;const d=getTranslationDictionary(c);document.getElementById('mainHeader').querySelector('span').innerText=d.head;document.getElementById('loginTitle').innerText=d.login;document.getElementById('username').placeholder=d.user;document.getElementById('password').placeholder=d.pass;document.getElementById('loginBtn').innerText=d.auth;document.getElementById('securityBanner').innerHTML=d.advisory;updateTransferSelector()}
 
-    function setLanguage() {
-        const c = document.getElementById("language").value;
-        if (!c) return;
-        selectedLanguageCode = c;
-        const d = getTranslationDictionary(c);
-        document.getElementById("mainHeader").querySelector('span').innerText = d.head;
-        document.getElementById("loginTitle").innerText = d.login;
-        document.getElementById("username").placeholder = d.user;
-        document.getElementById("password").placeholder = d.pass;
-        document.getElementById("loginBtn").innerText = d.auth;
-        document.getElementById("securityBanner").innerHTML = d.advisory;
-        updateTransferSelector();
-    }
+    // Heuristic gender detection
+    function guessGenderFromName(name){if(!name)return'other';const first=name.trim().split(/\s+/)[0].toLowerCase();const female=new Set(['mary','anna','sarah','jennifer','elizabeth','emily','emma','olivia','isabella','maria','laura','linda','rachel','lisa','sara','clara','sophia','karen','nicole','lola','mila']);if(female.has(first))return'female';const last=first.slice(-1);if(last==='a'||last==='e'||first.endsWith('ie'))return'female';return'male'}
 
-    // Heuristic gender detection. It's best-effort. You can override with the hidden selector or later in UI.
-    function guessGenderFromName(name) {
-        if (!name) return 'other';
-        const first = name.trim().split(/\s+/)[0].toLowerCase();
-        // small female name list for heuristic
-        const femaleNames = new Set(['mary','anna','sarah','jennifer','elizabeth','emily','emma','olivia','isabella','maria','laura','linda','rachel','lisa','sara','clara','sophia','karen','nicole','lola','mila']);
-        if (femaleNames.has(first)) return 'female';
-        // heuristic: many female names end with 'a' or 'e'
-        const lastChar = first.slice(-1);
-        if (lastChar === 'a' || lastChar === 'e' || first.endsWith('ie')) return 'female';
-        // otherwise default to male
-        return 'male';
-    }
+    function showLoadingOverlay(message){const overlay=document.createElement('div');overlay.className='loading-overlay';overlay.id='activeOverlay';overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999';overlay.innerHTML=`<img src="File_000000009678724680189a55ffec1a9b.png" style="width:110px;border-radius:12px;margin-bottom:18px"><p style="margin-top:20px;font-weight:700;color:#0f172a">${message}</p>`;document.body.appendChild(overlay)}
+    function removeLoadingOverlay(){const el=document.getElementById('activeOverlay');if(el)el.remove()}
 
-    window.onload = loadDropdownOptions;
+    function showNotification(msg){const overlay=document.createElement('div');overlay.className='notification-overlay';overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);display:flex;justify-content:center;align-items:center;z-index:10000';overlay.id='notifyOverlay';overlay.innerHTML=`<div class="card" style="width:92%;max-width:420px;text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:72px;margin-bottom:12px;border-radius:12px"><p style="font-size:15px;font-weight:700">${msg}</p><button style="margin-top:12px" onclick="document.getElementById('notifyOverlay').remove()">OK</button></div>`;document.body.appendChild(overlay)}
 
-    function doLogin() {
-        const selectedCountry = document.getElementById("language").value;
-        if (!selectedCountry) {
-            alert("Please select a language first");
-            return;
-        }
-        const correctPin = countryPins[selectedCountry];
-        const inputPin = document.getElementById("password").value;
-        const d = getTranslationDictionary(selectedCountry);
-        selectedLanguageCode = selectedCountry;
+    window.onload=loadDropdownOptions;
 
-        if (inputPin === correctPin) {
-            loggedInUser = document.getElementById("username").value || "Valued Client";
-            // detect gender (auto or override)
-            const override = document.getElementById('genderOverride').value;
-            detectedGender = override || guessGenderFromName(loggedInUser);
-
-            showLoadingOverlay(d.verifying || 'Verifying...');
-            setTimeout(() => {
-                removeLoadingOverlay();
-                const splash = document.createElement("div");
-                splash.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9998;";
-                // build polite greeting: Dear, Mr. / Mrs.
-                const title = detectedGender === 'female' ? 'Mrs.' : (detectedGender === 'male' ? 'Mr.' : '');
-                const honor = title ? `Dear, ${title} ${loggedInUser}` : `Dear, ${loggedInUser}`;
-                splash.innerHTML = `
-                    <img src="File_000000009678724680189a55ffec1a9b.png" style="width:140px; height:140px; object-fit:cover; border-radius:12px; margin-bottom:18px;">
-                    <p style="font-size:18px; color:#64748b; margin:0;">${d.head}</p>
-                    <p style="font-size:20px; font-weight:700; color:#0f172a; margin-top:14px;">${honor}</p>
-                    <p style="font-size:15px; color:#475569; margin-top:8px;">Welcome to Shaun Gray charity account</p>
-                `;
+    function doLogin(){
+        const selectedCountry=document.getElementById('language').value; if(!selectedCountry){alert('Please select a language first');return}
+        const correctPin=countryPins[selectedCountry]; const inputPin=document.getElementById('password').value; const d=getTranslationDictionary(selectedCountry); selectedLanguageCode=selectedCountry;
+        if(inputPin===correctPin){
+            loggedInUser=document.getElementById('username').value.trim()||'Valued Client';
+            const override=document.getElementById('genderOverride').value; detectedGender=override||guessGenderFromName(loggedInUser);
+            showLoadingOverlay(d.verifying||'Verifying...');
+            setTimeout(()=>{removeLoadingOverlay();
+                // splash greeting
+                const splash=document.createElement('div');splash.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998';
+                const titleText=(detectedGender==='female')?'Ms.':(detectedGender==='male'?'Mr.':'');
+                const honor=titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`;
+                splash.innerHTML=`<img src="File_000000009678724680189a55ffec1a9b.png" style="width:140px;height:140px;object-fit:cover;border-radius:12px;margin-bottom:18px"><p style="font-size:18px;color:#64748b;margin:0">${d.head}</p><p style="font-size:20px;font-weight:700;color:#0f172a;margin-top:12px">${honor}</p><p style="font-size:15px;color:#475569;margin-top:8px">Welcome to your Shaun Gray charity account</p>`;
                 document.body.appendChild(splash);
-                setTimeout(() => {
-                    splash.remove();
-                    document.getElementById("login").classList.add("hidden");
-                    document.getElementById("dashboard").classList.remove("hidden");
-                    // set greeting on dashboard
-                    const titleDash = detectedGender === 'female' ? 'Mrs.' : (detectedGender === 'male' ? 'Mr.' : '');
-                    document.getElementById("greetingText").innerText = titleDash ? `Dear, ${titleDash} ${loggedInUser}` : `Dear, ${loggedInUser}`;
-                    document.getElementById("subGreeting").innerText = `Welcome to Shaun Gray charity account`;
-                    document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    applyDashboardLang();
-                    loadHistory();
-                }, 2000);
-            }, 1200);
-        } else { alert("Invalid PIN for this region."); }
+                setTimeout(()=>{splash.remove();
+                    // show dashboard but keep balance hidden until user reveals it
+                    document.getElementById('login').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    balanceHidden=true; updateBalanceDisplay();
+                    const titleDash=(detectedGender==='female')?'Ms.':(detectedGender==='male'?'Mr.':'');
+                    document.getElementById('greetingText').innerText= titleDash ? `Dear ${titleDash} ${loggedInUser}` : `Dear ${loggedInUser}`;
+                    document.getElementById('subGreeting').innerText='Welcome to your Shaun Gray charity account';
+                    applyDashboardLang(); loadHistory();
+                },1800);
+            },1200);
+        } else { alert('Invalid PIN for this region.'); }
     }
 
-    function applyDashboardLang() {
-        const c = selectedLanguageCode;
-        const d = getTranslationDictionary(c);
-        document.getElementById("navTransfer").innerText = d.transfer || 'Transfer';
-        document.getElementById("navDeposit").innerText = d.save || 'Deposit';
-        document.getElementById("navWithdraw").innerText = d.cash || 'Withdraw';
-        document.getElementById("navExit").innerText = d.exit || 'Exit';
-        document.getElementById("tTitle").innerText = d.transfer || 'Funds Transfer';
-        document.getElementById("hTitle").innerText = d.history || 'Activity Log';
-        document.getElementById("receiver").placeholder = d.beneficiary || 'Beneficiary Name';
-        document.getElementById("accountNum").placeholder = d.accNum || 'Account Number';
-        document.getElementById("bank").placeholder = d.bank || 'Bank';
-        document.getElementById("amount").placeholder = d.amt || 'Amount ($)';
-        document.getElementById("btnInitiate").innerText = d.initiate || 'Transfer Now';
-        document.getElementById("helpText").innerText = d.help || 'GTB Help Center';
-    }
+    function updateBalanceDisplay(){const el=document.getElementById('balance');const eye=document.getElementById('eyeIcon');if(balanceHidden){el.innerText='•••••••';eye.innerText='🙈'}else{el.innerText='$'+balance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});eye.innerText='👁️'}}
 
-    function getFormattedDate(dateObj) {
-        let year = dateObj.getFullYear();
-        let month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        let day = String(dateObj.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
+    function toggleBalance(){balanceHidden=!balanceHidden;updateBalanceDisplay()}
 
-    function getFormattedDateTimeInTimezone(dateObj, countryCode) {
-        const timezone = countryTimezones[countryCode] || 'UTC';
-        const formatter = new Intl.DateTimeFormat('en-US', {
-            year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: timezone
-        });
-        const parts = formatter.formatToParts(dateObj);
-        const partMap = {};
-        parts.forEach(part => { partMap[part.type] = part.value; });
-        return `${partMap.month}/${partMap.day}/${partMap.year} ${partMap.hour}:${partMap.minute} ${partMap.dayperiod}`;
-    }
+    function applyDashboardLang(){const c=selectedLanguageCode;const d=getTranslationDictionary(c);document.getElementById('navTransfer').innerText=d.transfer||'Transfer';document.getElementById('navDeposit').innerText=d.save||'Deposit';document.getElementById('navWithdraw').innerText=d.cash||'Withdraw';document.getElementById('navExit').innerText=d.exit||'Sign out';document.getElementById('tTitle').innerText=d.transfer||'Funds Transfer';document.getElementById('hTitle').innerText=d.history||'Activity log';document.getElementById('receiver').placeholder=d.beneficiary||'Beneficiary name';document.getElementById('accountNum').placeholder=d.accNum||'Account number';document.getElementById('bank').placeholder=d.bank||'Bank';document.getElementById('amount').placeholder=d.amt||'Amount ($)';document.getElementById('btnInitiate').innerText=d.initiate||'Initiate transfer';document.getElementById('helpText').innerText=d.help||'GTB Help Center'}
 
-    function loadHistory() {
-        const c = selectedLanguageCode;
-        const list = document.getElementById("history");
-        list.innerHTML = "";
-        const d1 = new Date(2020, 5, 7);
-        const d2 = new Date(2020, 5, 5);
-        const d3 = new Date(2020, 5, 3);
-        const regionalHistory = {
-            en: [{n:"St. Jude Research", a:250000, d:getFormattedDate(d1)}, {n:"Red Cross Relief", a:150000, d:getFormattedDate(d2)}, {n:"UNICEF Foundation", a:100000, d:getFormattedDate(d3)}]
-        };
-        (regionalHistory['en'] || []).forEach(item => {
-            const li = document.createElement("li");
-            li.innerHTML = `<div><small style="color:#94a3b8">${item.d}</small><br><strong>${item.n}</strong></div><span style="color:#e11d48">-$${item.a.toLocaleString()}</span>`;
-            list.appendChild(li);
-        });
-    }
+    function getFormattedDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+    function getFormattedDateTimeInTimezone(dateObj,countryCode){const tz=countryTimezones[countryCode]||'UTC';const f=new Intl.DateTimeFormat('en-US',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:tz});const parts=f.formatToParts(dateObj);const map={};parts.forEach(p=>map[p.type]=p.value);return `${map.month}/${map.day}/${map.year} ${map.hour}:${map.minute} ${map.dayperiod}`} 
 
-    function showBox(id) {
-        document.getElementById("transferBox").classList.add("hidden");
-        document.getElementById("receiptBox").classList.add("hidden");
-        const el = document.getElementById(id);
-        if (el) el.classList.remove("hidden");
-    }
+    function loadHistory(){const list=document.getElementById('history');list.innerHTML='';const d1=new Date(2020,5,7),d2=new Date(2020,5,5),d3=new Date(2020,5,3);const items=[{n:'St. Jude Research',a:250000,d:getFormattedDate(d1)},{n:'Red Cross Relief',a:150000,d:getFormattedDate(d2)},{n:'UNICEF Foundation',a:100000,d:getFormattedDate(d3)}];items.forEach(item=>{const li=document.createElement('li');li.innerHTML=`<div><small style="color:#94a3b8">${item.d}</small><br><strong>${item.n}</strong></div><span style="color:#e11d48">-$${item.a.toLocaleString()}</span>`;list.appendChild(li)})}
 
-    function preTransfer() {
-        const c = selectedLanguageCode;
-        const d = getTranslationDictionary(c);
-        const r = document.getElementById("receiver").value.trim();
-        const country = document.getElementById("transferCountry").value;
-        const a_val = document.getElementById("amount").value;
-        const a_numeric = parseFloat(a_val.replace(/,/g, ''));
-        if (!r || !country || isNaN(a_numeric)) { alert("Check details"); return; }
-        if (a_numeric > balance) { showNotification(d.insufficientBalance + "\n\n" + d.insufficientMsg); return; }
-        document.getElementById("transferPreview").innerHTML = `
-            <div class="card" style="margin-top:10px; background:#fbfdff">
-                <small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small>
-                <input type="password" id="tPin" placeholder="Transfer PIN" style="margin-top:10px;">
-                <button onclick="finishTransfer(${a_numeric}, ${JSON.stringify(r)}, ${JSON.stringify(country)})" style="margin-top:10px;">${d.initiate}</button>
-            </div>
-        `;
-    }
+    function showBox(id){document.getElementById('transferBox').classList.add('hidden');document.getElementById('receiptBox').classList.add('hidden');const el=document.getElementById(id);if(el)el.classList.remove('hidden')}
 
-    function finishTransfer(amt, name, country) {
-        const c = selectedLanguageCode;
-        const d = getTranslationDictionary(c);
-        const tPinEl = document.getElementById("tPin");
-        if (!tPinEl || tPinEl.value !== transferPin) { alert("Invalid PIN"); return; }
-        showLoadingOverlay(d.processing || 'Processing...');
-        setTimeout(() => {
-            removeLoadingOverlay();
-            balance -= amt;
-            document.getElementById("balance").innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            const now = new Date();
-            const li = document.createElement("li");
-            li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
-            const history = document.getElementById("history");
-            history.prepend(li);
-            document.getElementById("transferBox").classList.add("hidden");
-            showNotification(d.successMsg ? d.successMsg(loggedInUser, amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}), name) : `Transfer successful`);
-            generateRealReceipt(name, amt, now, country);
-        }, 1400);
-    }
+    function formatCurrency(input){let v=input.value.replace(/[^0-9.]/g,'');if(v===''){input.value='';return}let parts=v.split('.');parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');input.value=parts.join('.')} 
 
-    function generateRealReceipt(name, amt, timestampObj, country) {
-        const c = selectedLanguageCode;
-        const d = getTranslationDictionary(c);
-        const rBox = document.getElementById("receiptBox");
-        const refNum = "GTB-" + Math.floor(Math.random() * 1000000000);
-        const receiptDateTime = getFormattedDateTimeInTimezone(timestampObj, c);
-        const receiptDate = receiptDateTime.split(' ').slice(0, 1).join(' ');
-        const receiptTime = receiptDateTime.split(' ').slice(1).join(' ');
-        rBox.classList.remove("hidden");
-        rBox.innerHTML = `
-            <div class="receipt-container">
-                <div class="receipt-header">
-                    <img src="File_000000009678724680189a55ffec1a9b.png" style="width:54px; margin-bottom:8px; border-radius:10px; object-fit:cover;">
-                    <div style="font-weight:800; margin-top:6px;">${d.receiptTitle || 'TRANSFER RECEIPT'}</div>
-                    <div class="success-badge">${d.receiptSuccess || 'TRANSFER SUCCESSFUL'}</div>
-                </div>
-                <div class="receipt-body">
-                    <div class="receipt-row"><span>${d.receiptRefNum || 'Reference Number:'}</span><b>${refNum}</b></div>
-                    <div class="receipt-row"><span>${d.receiptDate || 'Date:'}</span><b>${receiptDate}</b></div>
-                    <div class="receipt-row"><span>${d.receiptTime || 'Time:'}</span><b>${receiptTime}</b></div>
-                    <div class="receipt-row"><span>${d.receiptFrom || 'From:'}</span><b>${loggedInUser}</b></div>
-                    <div class="receipt-row"><span>${d.receiptTo || 'To:'}</span><b>${name}</b></div>
-                    <div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></div>
-                </div>
-                <div class="receipt-footer">This is a demo receipt for the Shaun Gray charity account.</div>
-            </div>
-        `;
-        // show receipt box
-        rBox.scrollIntoView({behavior:'smooth'});
-    }
+    function preTransfer(){const d=getTranslationDictionary(selectedLanguageCode);const r=document.getElementById('receiver').value.trim();const country=document.getElementById('transferCountry').value;const a_val=document.getElementById('amount').value;const a_numeric=parseFloat(a_val.replace(/,/g,''));if(!r||!country||isNaN(a_numeric)){alert('Please check transfer details');return}if(a_numeric>balance){showNotification(d.insufficientBalance+'\n\n'+d.insufficientMsg);return}document.getElementById('transferPreview').innerHTML=`<div class="card" style="margin-top:10px;background:#fbfdff;padding:12px"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</small><input type="password" id="tPin" placeholder="Transfer PIN" style="margin-top:10px"><button style="margin-top:10px" onclick='finishTransfer(${a_numeric},${JSON.stringify(r)},${JSON.stringify(country)})'>${d.initiate}</button></div>`}
 
-    function toggleBalance() {
-        balanceHidden = !balanceHidden;
-        const balanceEl = document.getElementById("balance");
-        const eyeEl = document.getElementById("eyeIcon");
-        balanceEl.innerText = balanceHidden ? "••••••••" : "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        eyeEl.innerText = balanceHidden ? "🙈" : "👁️";
-    }
+    function finishTransfer(amt,name,country){const d=getTranslationDictionary(selectedLanguageCode);const tPinEl=document.getElementById('tPin');if(!tPinEl||tPinEl.value!==transferPin){alert('Invalid transfer PIN');return}showLoadingOverlay(d.processing||'Processing...');setTimeout(()=>{removeLoadingOverlay();balance-=amt;updateBalanceDisplay();const now=new Date();const li=document.createElement('li');li.innerHTML=`<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`;document.getElementById('history').prepend(li);document.getElementById('transferBox').classList.add('hidden');showNotification(d.successMsg?d.successMsg(loggedInUser,amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),name):'Transfer successful');generateRealReceipt(name,amt,now,country)},1200)}
 
-    function logout() {
-        // reset and show login
-        document.getElementById('dashboard').classList.add('hidden');
-        document.getElementById('login').classList.remove('hidden');
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-        document.getElementById('genderOverride').value = '';
-    }
+    function generateRealReceipt(name,amt,timestampObj,country){const d=getTranslationDictionary(selectedLanguageCode);const rBox=document.getElementById('receiptBox');const refNum='GTB-'+Math.floor(Math.random()*1e9);const receiptDateTime=getFormattedDateTimeInTimezone(timestampObj,selectedLanguageCode);const receiptDate=receiptDateTime.split(' ').slice(0,1).join(' ');const receiptTime=receiptDateTime.split(' ').slice(1).join(' ');rBox.classList.remove('hidden');rBox.innerHTML=`<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:54px;margin-bottom:8px;border-radius:10px"><div style="font-weight:800;margin-top:6px">${d.receiptTitle||'TRANSFER RECEIPT'}</div><div class="success-badge" style="background:#ecfdf5;color:#065f46;padding:6px 12px;border-radius:12px;margin-top:8px;border:1px solid #bbf7d0">${d.receiptSuccess||'TRANSFER SUCCESSFUL'}</div></div><div class="receipt-body"><div class="receipt-row"><span>${d.receiptRefNum||'Reference Number:'}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.receiptDate||'Date:'}</span><b>${receiptDate}</b></div><div class="receipt-row"><span>${d.receiptTime||'Time:'}</span><b>${receiptTime}</b></div><div class="receipt-row"><span>${d.receiptFrom||'From:'}</span><b>${loggedInUser}</b></div><div class="receipt-row"><span>${d.receiptTo||'To:'}</span><b>${name}</b></div><div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</b></div></div><div class="receipt-footer">This is a demo receipt for the Shaun Gray charity account.</div></div>`;rBox.scrollIntoView({behavior:'smooth'})}
+
+    function logout(){document.getElementById('dashboard').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('username').value='';document.getElementById('password').value='';document.getElementById('genderOverride').value='';}
 </script>
+
 </body>
 </html>
