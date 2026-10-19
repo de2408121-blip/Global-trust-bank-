@@ -71,12 +71,12 @@
             <input type="password" id="password" placeholder="Access PIN" style="margin-top:10px">
 
             <button id="loginBtn" onclick="doLogin()" style="margin-top:12px">Sign in securely</button>
-            <small style="display:block;margin-top:10px;color:#64748b">This demo shows a secure sign-in flow — never share your PIN.</small>
+            <small style="display:block;margin-top:10px;color:#64748b">Secure sign-in — never share your PIN.</small>
         </div>
 
         <div class="card" style="margin-top:16px">
-            <h4 style="margin:0 0 10px 0">About this demo</h4>
-            <p style="margin:0;color:#475569;line-height:1.4">For privacy the dashboard displays only the bank logo. You select your title during sign in; transfers and receipts are functional in this demo.</p>
+            <h4 style="margin:0 0 10px 0">About</h4>
+            <p style="margin:0;color:#475569;line-height:1.4">For privacy the dashboard displays only the bank logo. You select your title during sign in; transfers and receipts are functional.</p>
         </div>
     </div>
 
@@ -136,7 +136,7 @@
                     <button onclick="saveSettings()">Save settings</button>
                     <button onclick="resetSettings()" style="background:#94a3b8">Reset</button>
                 </div>
-                <div style="margin-top:12px" class="muted small">Settings are stored locally in your browser for this demo.</div>
+                <div style="margin-top:12px" class="muted small">Settings are stored locally in your browser for this account.</div>
             </div>
 
             <div id="receiptBox" class="card hidden" style="margin-top:14px;padding:0;background:transparent;box-shadow:none"></div>
@@ -151,53 +151,15 @@
     </div>
 </div>
 
-<!-- overlays -->
-<div id="twofaOverlay" class="overlay hidden">
-    <div class="card">
-        <h3>Two-factor authentication</h3>
-        <p class="muted">A verification code has been sent to your registered device. Enter it below to continue.</p>
-        <div style="margin-top:12px">
-            <input id="twofaCodeInput" placeholder="Enter 6-digit code">
-            <div style="display:flex;gap:8px;margin-top:8px">
-                <button onclick="verify2FA()">Verify code</button>
-                <button onclick="resend2FA()" style="background:#94a3b8">Resend code</button>
-            </div>
-            <div style="margin-top:10px" class="small muted">For demo: click "Resend code" to show a simulated code.</div>
-        </div>
-    </div>
-</div>
-
-<div id="sessionWarning" class="overlay hidden">
-    <div class="card">
-        <h4>Session expiring</h4>
-        <p class="muted">Your session will expire soon due to inactivity. Would you like to extend your session?</p>
-        <div style="display:flex;gap:8px;margin-top:12px">
-            <button onclick="extendSession()">Keep me signed in</button>
-            <button onclick="endSession()" style="background:#94a3b8">Sign out</button>
-        </div>
-    </div>
-</div>
-
 <script>
-    // Demo state
+    // Demo-free state
     let balance = 590000.75;
-    const transferPin = '2468'; // demo transfer PIN
-    let balanceHidden = true; // keep balance hidden until user chooses to reveal
+    let balanceHidden = true;
     let loggedInUser = '';
-    let selectedLanguageCode = '';
+    let selectedLanguageCode = 'en';
     let detectedGender = '';
-    let generated2FACode = null;
-
-    // Session timeout (demo): 5 minutes inactivity, warning at 60s left
-    const SESSION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
-    const SESSION_WARNING_MS = 60 * 1000; // show warning when 60s left
-    let sessionTimer = null;
-    let sessionWarningTimer = null;
 
     const countryTimezones = { en:'America/New_York', id:'Asia/Jakarta', ms:'Asia/Kuala_Lumpur', pt:'America/Sao_Paulo', th:'Asia/Bangkok', es:'Europe/Madrid', de:'Europe/Berlin', ar:'Asia/Riyadh', fr:'Europe/Paris', it:'Europe/Rome', ja:'Asia/Tokyo', da:'Europe/Copenhagen', no:'Europe/Oslo', fil:'Asia/Manila', pl:'Europe/Warsaw', tr:'Europe/Istanbul', tet:'Asia/Dili', vi:'Asia/Ho_Chi_Minh', gb:'Europe/London' };
-
-    // demo country PINs (for login demo only)
-    const countryPins = { en:'444111', id:'444222', ms:'444333', pt:'444555', th:'444666', es:'444777', de:'444888', ar:'444999', fr:'555111', it:'555222', ja:'555333', da:'555555', pl:'555666', no:'666666', fil:'666777', tr:'555999', tet:'666222', vi:'666111', gb:'777777' };
 
     const countryDropdownOptions = [
         {code:'en',flag:'🇺🇸',name:'United States',langCode:'en'},
@@ -236,10 +198,10 @@
         {code:'vi',flag:'🇻🇳',name:'Vietnam',langCode:'vi'}
     ];
 
-    // Translation dictionary for several languages
+    // Translation dictionary (no demo text)
     const langData = {
-        en: { head:'GLOBAL TRUST BANK', login:'Sign in', user:'Username', pass:'Access PIN', auth:'Sign in securely', transfer:'Transfer', save:'Deposit', cash:'Withdraw', exit:'Sign out', history:'Activity log', beneficiary:'Beneficiary name', accNum:'Account number', bank:'Bank', amt:'Amount ($)', initiate:'Initiate transfer', verifying:'Verifying...', processing:'Processing transaction...', confirm:'Confirm amount', selectPlaceholder:'Select destination country', advisory:'<b>Security notice</b> Never share your PIN. Global Trust Bank will never ask for your PIN over email or phone.', receiptTitle:'TRANSFER RECEIPT', receiptSuccess:'TRANSFER SUCCESSFUL', receiptRefNum:'Reference number:', receiptDate:'Date:', receiptTime:'Time:', receiptFrom:'From:', receiptTo:'To:', successMsg:(u,a,n)=>`Transfer of $${a} to ${n} successful!`, insufficientBalance:'Insufficient balance', insufficientMsg:'You do not have enough balance to complete this transfer.', help:'GTB Help Center', twofaSent:'Two-factor code sent', twofaSentDemo:'(demo: use Resend to show a code)', destNames:{} },
-        es: { head:'BANCO GLOBAL TRUST', login:'Iniciar sesión', user:'Usuario', pass:'PIN de acceso', auth:'Iniciar sesión de forma segura', transfer:'Transferir', save:'Depositar', cash:'Retirar', exit:'Salir', history:'Historial', beneficiary:'Nombre del beneficiario', accNum:'Número de cuenta', bank:'Banco', amt:'Importe ($)', initiate:'Iniciar transferencia', verifying:'Verificando...', processing:'Procesando...', confirm:'Confirmar importe', selectPlaceholder:'Seleccione país', advisory:'<b>Aviso de seguridad</b> No comparta su PIN.', receiptTitle:'COMPROBANTE', receiptSuccess:'TRANSFERENCIA EXITOSA', receiptRefNum:'Nº de referencia:', receiptDate:'Fecha:', receiptTime:'Hora:', receiptFrom:'De:', receiptTo:'Para:', successMsg:(u,a,n)=>`¡Transferencia de $${a} a ${n} realizada!`, insufficientBalance:'Saldo insuficiente', insufficientMsg:'No tiene suficiente saldo para completar la transferencia.', help:'Centro de ayuda GTB', twofaSent:'Código enviado', twofaSentDemo:'(demo: use Reenviar para mostrar código)', destNames:{} }
+        en: { head:'GLOBAL TRUST BANK', login:'Sign in', user:'Username', pass:'Access PIN', auth:'Sign in securely', transfer:'Transfer', save:'Deposit', cash:'Withdraw', exit:'Sign out', history:'Activity log', beneficiary:'Beneficiary name', accNum:'Account number', bank:'Bank', amt:'Amount ($)', initiate:'Initiate transfer', verifying:'Verifying...', processing:'Processing transaction...', confirm:'Confirm amount', selectPlaceholder:'Select destination country', advisory:'<b>Security notice</b> Never share your PIN. Global Trust Bank will never ask for your PIN over email or phone.', receiptTitle:'TRANSFER RECEIPT', receiptSuccess:'TRANSFER SUCCESSFUL', receiptRefNum:'Reference number:', receiptDate:'Date:', receiptTime:'Time:', receiptFrom:'From:', receiptTo:'To:', successMsg:(u,a,n)=>`Transfer of $${a} to ${n} successful!`, insufficientBalance:'Insufficient balance', insufficientMsg:'You do not have enough balance to complete this transfer.', help:'GTB Help Center', destNames:{} },
+        es: { head:'BANCO GLOBAL TRUST', login:'Iniciar sesión', user:'Usuario', pass:'PIN de acceso', auth:'Iniciar sesión de forma segura', transfer:'Transferir', save:'Depositar', cash:'Retirar', exit:'Salir', history:'Historial', beneficiary:'Nombre del beneficiario', accNum:'Número de cuenta', bank:'Banco', amt:'Importe ($)', initiate:'Iniciar transferencia', verifying:'Verificando...', processing:'Procesando...', confirm:'Confirmar importe', selectPlaceholder:'Seleccione país', advisory:'<b>Aviso de seguridad</b> No comparta su PIN.', receiptTitle:'COMPROBANTE', receiptSuccess:'TRANSFERENCIA EXITOSA', receiptRefNum:'Nº de referencia:', receiptDate:'Fecha:', receiptTime:'Hora:', receiptFrom:'De:', receiptTo:'Para:', successMsg:(u,a,n)=>`¡Transferencia de $${a} a ${n} realizada!`, insufficientBalance:'Saldo insuficiente', insufficientMsg:'No tiene suficiente saldo para completar la transferencia.', help:'Centro de ayuda GTB', destNames:{} }
     };
 
     function getTranslationDictionary(countryCode){return langData[countryCode]||langData['en']}
@@ -262,7 +224,7 @@
 
     window.onload=loadDropdownOptions;
 
-    // Heuristic gender detection from name (very simple demo list)
+    // Heuristic gender detection from name (simple)
     function guessGenderFromName(name){ if(!name) return 'other'; const first = name.trim().split(/\s+/)[0].toLowerCase(); const female = new Set(['mary','anna','sarah','jennifer','elizabeth','emily','emma','sophia','isabella','mia']); const male = new Set(['john','mike','michael','robert','david','james','william','alex','alexander','luke']); if(female.has(first)) return 'female'; if(male.has(first)) return 'male'; return 'other'; }
 
     function showLoadingOverlay(message){const overlay=document.createElement('div');overlay.className='overlay';overlay.id='activeOverlay';overlay.innerHTML=`<div class="card"><div style="text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:80px;margin-bottom:12px"><div style="font-weight:700">${message}</div></div></div>`;document.body.appendChild(overlay)}
@@ -275,21 +237,14 @@
     function loadProfile(username){try{return JSON.parse(localStorage.getItem(profileKey(username)))||{}}catch(e){return {}}}
 
     function doLogin(){
-        const selectedCountry=document.getElementById('language').value; if(!selectedCountry){alert('Please select a language first');return}
-        const correctPin=countryPins[selectedCountry]; const inputPin=document.getElementById('password').value; const d=getTranslationDictionary(selectedCountry); selectedLanguageCode=selectedCountry;
-        if(inputPin===correctPin){
-            loggedInUser=document.getElementById('username').value.trim()||'Valued Client';
-            const override=document.getElementById('genderOverride').value; detectedGender = override || guessGenderFromName(loggedInUser);
-            const existing = loadProfile(loggedInUser);
-            if(existing && existing.title) detectedGender = existing.title === 'male' ? 'male' : (existing.title === 'female' ? 'female' : 'other');
-            showLoadingOverlay(d.verifying||'Verifying...');
-            setTimeout(()=>{ removeLoadingOverlay(); start2FA(); },800);
-        } else { alert('Invalid PIN for this region.'); }
+        const inputPin=document.getElementById('password').value.trim(); if(inputPin.length < 4){ alert('Enter a valid PIN (at least 4 digits).'); return }
+        loggedInUser=document.getElementById('username').value.trim()||'Valued Client';
+        const override=document.getElementById('genderOverride').value; detectedGender = override || guessGenderFromName(loggedInUser);
+        const existing = loadProfile(loggedInUser);
+        if(existing && existing.title) detectedGender = existing.title === 'male' ? 'male' : (existing.title === 'female' ? 'female' : 'other');
+        showLoadingOverlay(getTranslationDictionary(selectedLanguageCode).verifying||'Verifying...');
+        setTimeout(()=>{ removeLoadingOverlay(); afterSuccessfulLogin(); },700);
     }
-
-    function start2FA(){ generated2FACode = String(Math.floor(100000 + Math.random()*900000)); document.getElementById('twofaOverlay').classList.remove('hidden'); const d=getTranslationDictionary(selectedLanguageCode); showNotification(d.twofaSent + '\n\n' + d.twofaSentDemo); }
-    function resend2FA(){ generated2FACode = String(Math.floor(100000 + Math.random()*900000)); showNotification('Demo 2FA code: ' + generated2FACode); }
-    function verify2FA(){ const val=document.getElementById('twofaCodeInput').value.trim(); if(val===generated2FACode){ document.getElementById('twofaOverlay').classList.add('hidden'); generated2FACode=null; afterSuccessfulLogin(); } else { alert('Invalid verification code. Use "Resend code" to get a demo code.'); } }
 
     function afterSuccessfulLogin(){
         const d=getTranslationDictionary(selectedLanguageCode);
@@ -303,21 +258,14 @@
         const honor = titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`;
         splash.innerHTML = `<div style="text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:140px;height:140px;object-fit:cover;border-radius:12px;margin-bottom:18px"><div style="font-size:18px;color:#94a3b8">${d.head}</div><div style="font-size:20px;font-weight:700;color:#0f172a;margin-top:12px">${honor} — welcome to Shaun Gray charity account</div></div>`;
         document.body.appendChild(splash);
-        setTimeout(()=>{ splash.remove(); document.getElementById('login').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); balanceHidden=true; updateBalanceDisplay(); document.getElementById('greetingText').innerText = titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`; document.getElementById('subGreeting').innerText = 'Welcome to your Shaun Gray charity account'; applyDashboardLang(); loadHistory(); populateSettingsFromProfile(); startSessionTimer(); },1200);
+        setTimeout(()=>{ splash.remove(); document.getElementById('login').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); balanceHidden=true; updateBalanceDisplay(); document.getElementById('greetingText').innerText = titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`; document.getElementById('subGreeting').innerText = 'Welcome to your Shaun Gray charity account'; applyDashboardLang(); loadHistory(); populateSettingsFromProfile(); },900);
     }
 
     function populateSettingsFromProfile(){ const p=loadProfile(loggedInUser)||{}; document.getElementById('settingsTitle').value = p.title || ''; const last = p.previousLogin? new Date(p.previousLogin): null; document.getElementById('lastLoginDisplay').innerText = last? 'Previous: ' + last.toLocaleString() : 'No previous login'; document.getElementById('lastDeviceDisplay').innerText = p.previousDevice? `Previous device: ${truncateDevice(p.previousDevice)}` : ''; }
     function truncateDevice(s){ if(!s) return ''; return s.split(')')[0] + ')' }
 
-    // Session timer helpers
-    function startSessionTimer(){ clearSessionTimers(); const timeout = SESSION_TIMEOUT_MS; sessionWarningTimer = setTimeout(()=>{ document.getElementById('sessionWarning').classList.remove('hidden'); }, timeout - SESSION_WARNING_MS); sessionTimer = setTimeout(()=>{ endSession(); }, timeout); ['mousemove','keydown','click','scroll'].forEach(ev=>window.addEventListener(ev, resetSessionTimer)); }
-    function resetSessionTimer(){ clearSessionTimers(); startSessionTimer(); }
-    function clearSessionTimers(){ if(sessionTimer) clearTimeout(sessionTimer); if(sessionWarningTimer) clearTimeout(sessionWarningTimer); }
-    function extendSession(){ document.getElementById('sessionWarning').classList.add('hidden'); resetSessionTimer(); }
-    function endSession(){ clearSessionTimers(); document.getElementById('sessionWarning').classList.add('hidden'); document.getElementById('dashboard').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); document.getElementById('password').value=''; document.getElementById('username').value=''; document.getElementById('genderOverride').value=''; loggedInUser=''; ['mousemove','keydown','click','scroll'].forEach(ev=>window.removeEventListener(ev, resetSessionTimer)); showNotification('You have been signed out due to inactivity.'); }
-
     function updateBalanceDisplay(){ const el=document.getElementById('balance'); const eye=document.getElementById('eyeIcon'); if(balanceHidden){ el.innerText='•••••••'; eye.innerText='🙈'; } else { el.innerText = '$' + balance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); eye.innerText='👁️'; } }
-    function toggleBalance(){ balanceHidden=!balanceHidden; updateBalanceDisplay(); resetSessionTimer(); }
+    function toggleBalance(){ balanceHidden=!balanceHidden; updateBalanceDisplay(); }
 
     function applyDashboardLang(){ const c = selectedLanguageCode || 'en'; const d = getTranslationDictionary(c); document.getElementById('navTransfer').innerText = d.transfer || 'Transfer'; document.getElementById('navDeposit').innerText = d.save || 'Deposit'; document.getElementById('navWithdraw').innerText = d.cash || 'Withdraw'; document.getElementById('navSettings').innerText = d.settings || 'Settings'; document.getElementById('tTitle').innerText = d.transfer; document.getElementById('hTitle').innerText = d.history || 'Activity log'; document.getElementById('receiver').placeholder = d.beneficiary; document.getElementById('accountNum').placeholder = d.accNum; document.getElementById('bank').placeholder = d.bank; document.getElementById('amount').placeholder = d.amt; document.getElementById('btnInitiate').innerText = d.initiate; document.getElementById('helpText').innerText = d.help; }
 
@@ -332,14 +280,14 @@
 
     function preTransfer(){ const d = getTranslationDictionary(selectedLanguageCode); const r = document.getElementById('receiver').value.trim(); const country = document.getElementById('transferCountry').value; const a_val = document.getElementById('amount').value; const a_numeric = parseFloat(a_val.replace(/,/g,'')); if(!r||!country||isNaN(a_numeric)){ alert('Check details'); return } if(a_numeric>balance){ showNotification(d.insufficientMsg || 'Insufficient balance'); return } document.getElementById('transferPreview').innerHTML = `<div class="card" style="margin-top:10px;background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</small><input type="password" id="tPin" placeholder="Transfer PIN" style="margin-top:10px"><button onclick="finishTransfer(${a_numeric}, '${r.replace(/'/g,"\\'")}', '${country.replace(/'/g,"\\'")}')" style="margin-top:10px">${d.initiate}</button></div>` }
 
-    function finishTransfer(amt,name,country){ const d = getTranslationDictionary(selectedLanguageCode); const tPinEl = document.getElementById('tPin'); if(!tPinEl||tPinEl.value!==transferPin){ alert('Invalid PIN'); return } showLoadingOverlay(d.processing||'Processing...'); setTimeout(()=>{ removeLoadingOverlay(); balance -= amt; updateBalanceDisplay(); const now=new Date(); const li=document.createElement('li'); li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`; const history=document.getElementById('history'); if(history) history.prepend(li); document.getElementById('transferBox').classList.add('hidden'); showNotification(d.successMsg? d.successMsg(loggedInUser, amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}), name) : 'Transfer successful'); generateRealReceipt(name, amt, now, selectedLanguageCode); },1100); }
+    function finishTransfer(amt,name,country){ const d = getTranslationDictionary(selectedLanguageCode); const tPinEl = document.getElementById('tPin'); if(!tPinEl||tPinEl.value.trim().length < 4){ alert('Enter valid transfer PIN.'); return } showLoadingOverlay(d.processing||'Processing...'); setTimeout(()=>{ removeLoadingOverlay(); balance -= amt; updateBalanceDisplay(); const now=new Date(); const li=document.createElement('li'); li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`; const history=document.getElementById('history'); if(history) history.prepend(li); document.getElementById('transferBox').classList.add('hidden'); showNotification(d.successMsg? d.successMsg(loggedInUser, amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}), name) : 'Transfer successful'); generateRealReceipt(name, amt, now, selectedLanguageCode); },1100); }
 
     function generateRealReceipt(name,amt,timestampObj,country){ const d = getTranslationDictionary(selectedLanguageCode); const rBox = document.getElementById('receiptBox'); const refNum = 'GTB-' + Math.floor(Math.random()*1000000000); const receiptDateTime = getFormattedDateTimeInTimezone(timestampObj, selectedLanguageCode); const [datePart, timePart] = receiptDateTime.split(' '); rBox.classList.remove('hidden'); rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:48px;margin-bottom:8px;border-radius:8px;object-fit:cover"><div style="font-weight:800;font-size:14px">${d.receiptTitle||'TRANSFER RECEIPT'}</div><div class="success-badge">${d.receiptSuccess||'TRANSFER SUCCESSFUL'}</div></div><div class="receipt-body"><div class="receipt-row"><span>${d.receiptRefNum||'Reference number:'}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.receiptDate||'Date:'}</span><b>${datePart}</b></div><div class="receipt-row"><span>${d.receiptTime||'Time:'}</span><b>${timePart}</b></div><div class="receipt-row"><span>${d.receiptFrom||'From:'}</span><b>${loggedInUser}</b></div><div class="receipt-row"><span>${d.receiptTo||'To:'}</span><b>${name}</b></div><div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</b></div></div><div class="receipt-footer">Thank you for banking with Global Trust Bank</div></div>`; window.scrollTo({top:rBox.offsetTop-20,behavior:'smooth'}); }
 
-    function saveSettings(){ const title = document.getElementById('settingsTitle').value || ''; const p = loadProfile(loggedInUser) || {}; p.title = title; saveProfile(loggedInUser,p); showNotification('Settings saved locally.'); populateSettingsFromProfile(); resetSessionTimer(); }
+    function saveSettings(){ const title = document.getElementById('settingsTitle').value || ''; const p = loadProfile(loggedInUser) || {}; p.title = title; saveProfile(loggedInUser,p); showNotification('Settings saved locally.'); populateSettingsFromProfile(); }
     function resetSettings(){ document.getElementById('settingsTitle').value=''; const p = loadProfile(loggedInUser)||{}; delete p.title; saveProfile(loggedInUser,p); showNotification('Settings reset'); populateSettingsFromProfile(); }
 
-    function logout(){ endSession() }
+    function logout(){ document.getElementById('dashboard').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); document.getElementById('password').value=''; document.getElementById('username').value=''; document.getElementById('genderOverride').value=''; loggedInUser=''; showNotification('You have been signed out.'); }
 
 </script>
 
