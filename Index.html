@@ -34,6 +34,11 @@
         .receipt-row span{color:#64748b}
         .receipt-footer{padding:12px;background:#fbfdff;color:#94a3b8;text-align:center}
         .helpBtn{margin-top:16px;background:var(--dark-bg);color:#fff;border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+        .settings-row{display:flex;gap:8px;align-items:center;}
+        .muted{color:#64748b;font-size:13px}
+        .small{font-size:13px}
+        .overlay{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:12000}
+        .overlay .card{max-width:420px}
         @media(max-width:900px){.container{grid-template-columns:1fr;padding:12px}}
     </style>
 </head>
@@ -94,7 +99,7 @@
                 <div class="action-icon" onclick="showBox('transferBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/forward-arrow.png"><div id="navTransfer">Transfer</div></div>
                 <div class="action-icon" onclick="showBox('depositBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/plus.png"><div id="navDeposit">Deposit</div></div>
                 <div class="action-icon" onclick="showBox('withdrawBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/minus.png"><div id="navWithdraw">Withdraw</div></div>
-                <div class="action-icon" onclick="logout()"><img src="https://img.icons8.com/ios-filled/50/4f46e5/shutdown.png"><div id="navExit">Sign out</div></div>
+                <div class="action-icon" onclick="showBox('settingsBox')"><img src="https://img.icons8.com/ios-filled/50/4f46e5/settings.png"><div id="navSettings">Settings</div></div>
             </div>
 
             <div id="transferBox" class="card hidden" style="margin-top:14px">
@@ -110,6 +115,30 @@
                 <div id="transferPreview"></div>
             </div>
 
+            <div id="settingsBox" class="card hidden" style="margin-top:14px">
+                <h4>Account settings</h4>
+                <div style="margin-top:8px" class="small muted">Change your title and review recent login info for this account.</div>
+                <div style="margin-top:12px">
+                    <label class="small">Title</label>
+                    <select id="settingsTitle" style="margin-top:8px">
+                        <option value="">Auto-detect title</option>
+                        <option value="male">Mr.</option>
+                        <option value="female">Ms.</option>
+                        <option value="other">Prefer not to say</option>
+                    </select>
+                </div>
+                <div style="margin-top:12px">
+                    <label class="small">Last login</label>
+                    <div id="lastLoginDisplay" class="muted" style="margin-top:6px">—</div>
+                    <div id="lastDeviceDisplay" class="muted small" style="margin-top:6px">—</div>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                    <button onclick="saveSettings()">Save settings</button>
+                    <button onclick="resetSettings()" style="background:#94a3b8">Reset</button>
+                </div>
+                <div style="margin-top:12px" class="muted small">Settings are stored locally in your browser for this demo.</div>
+            </div>
+
             <div id="receiptBox" class="card hidden" style="margin-top:14px;padding:0;background:transparent;box-shadow:none"></div>
 
             <div class="card" style="margin-top:14px">
@@ -122,6 +151,33 @@
     </div>
 </div>
 
+<!-- overlays -->
+<div id="twofaOverlay" class="overlay hidden">
+    <div class="card">
+        <h3>Two-factor authentication</h3>
+        <p class="muted">A verification code has been sent to your registered device. Enter it below to continue.</p>
+        <div style="margin-top:12px">
+            <input id="twofaCodeInput" placeholder="Enter 6-digit code">
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button onclick="verify2FA()">Verify code</button>
+                <button onclick="resend2FA()" style="background:#94a3b8">Resend code</button>
+            </div>
+            <div style="margin-top:10px" class="small muted">For demo: click "Resend code" to show a simulated code.</div>
+        </div>
+    </div>
+</div>
+
+<div id="sessionWarning" class="overlay hidden">
+    <div class="card">
+        <h4>Session expiring</h4>
+        <p class="muted">Your session will expire soon due to inactivity. Would you like to extend your session?</p>
+        <div style="display:flex;gap:8px;margin-top:12px">
+            <button onclick="extendSession()">Keep me signed in</button>
+            <button onclick="endSession()" style="background:#94a3b8">Sign out</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Demo state
     let balance = 590000.75;
@@ -130,6 +186,13 @@
     let loggedInUser = '';
     let selectedLanguageCode = '';
     let detectedGender = '';
+    let generated2FACode = null;
+
+    // Session timeout (demo): 5 minutes inactivity, warning at 60s left
+    const SESSION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+    const SESSION_WARNING_MS = 60 * 1000; // show warning when 60s left
+    let sessionTimer = null;
+    let sessionWarningTimer = null;
 
     const countryTimezones = { en:'America/New_York', id:'Asia/Jakarta', ms:'Asia/Kuala_Lumpur', pt:'America/Sao_Paulo', th:'Asia/Bangkok', es:'Europe/Madrid', de:'Europe/Berlin', ar:'Asia/Riyadh', fr:'Europe/Paris', it:'Europe/Rome', ja:'Asia/Tokyo', da:'Europe/Copenhagen', no:'Europe/Oslo', fil:'Asia/Manila', pl:'Europe/Warsaw', tr:'Europe/Istanbul', tet:'Asia/Dili', vi:'Asia/Ho_Chi_Minh', gb:'Europe/London' };
 
@@ -173,9 +236,14 @@
         {code:'vi',flag:'🇻🇳',name:'Vietnam',langCode:'vi'}
     ];
 
-    // Minimal translation dictionary (falls back to English)
+    // Translation dictionary for several languages
     const langData = {
-        en:{head:'GLOBAL TRUST BANK',login:'Sign in',user:'Username',pass:'Access PIN',auth:'Sign in securely',transfer:'Transfer',save:'Deposit',cash:'Withdraw',exit:'Sign out',history:'Activity log',beneficiary:'Beneficiary name',accNum:'Account number',bank:'Bank',amt:'Amount ($)',initiate:'Initiate transfer',verifying:'Verifying your credentials...',processing:'Processing transfer...',confirm:'Confirm amount',selectPlaceholder:'Select destination country',advisory:'<b>Security notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN by message.',receiptTitle:'TRANSFER RECEIPT',receiptSuccess:'TRANSFER SUCCESSFUL',receiptRefNum:'Reference Number:',receiptDate:'Date:',receiptTime:'Time:',receiptFrom:'From:',receiptTo:'To:',successMsg:(user,amt,name)=>`Transfer of $${amt} to ${name} successful!`,insufficientBalance:'Insufficient Balance',insufficientMsg:'You do not have enough balance to complete this transfer.',help:'GTB Help Center',destNames:{} }
+        en: { head:'GLOBAL TRUST BANK', login:'Sign in', user:'Username', pass:'Access PIN', auth:'Sign in securely', transfer:'Transfer', save:'Deposit', cash:'Withdraw', exit:'Sign out', history:'Activity log', beneficiary:'Beneficiary name', accNum:'Account number', bank:'Bank', amt:'Amount ($)', initiate:'Initiate transfer', verifying:'Verifying your credentials...', processing:'Processing transfer...', confirm:'Confirm amount', selectPlaceholder:'Select destination country', advisory:'<b>Security notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN by message.', receiptTitle:'TRANSFER RECEIPT', receiptSuccess:'TRANSFER SUCCESSFUL', receiptRefNum:'Reference Number:', receiptDate:'Date:', receiptTime:'Time:', receiptFrom:'From:', receiptTo:'To:', successMsg:(user,amt,name)=>`Transfer of $${amt} to ${name} successful!`, insufficientBalance:'Insufficient Balance', insufficientMsg:'You do not have enough balance to complete this transfer.', help:'GTB Help Center', twofaSent:'A verification code has been sent to your registered device.', twofaSentDemo:'(Demo: use "Resend code" to display the 2FA code.)', sessionExpiring:'Your session is about to expire due to inactivity.', keepSigned:'Keep me signed in', destNames:{} },
+        es: { head:'BANCO GLOBAL TRUST', login:'Iniciar sesión', user:'Usuario', pass:'PIN de acceso', auth:'Iniciar sesión de forma segura', transfer:'Transferir', save:'Depositar', cash:'Retirar', exit:'Cerrar sesión', history:'Registro de actividad', beneficiary:'Nombre del beneficiario', accNum:'Número de cuenta', bank:'Banco', amt:'Importe ($)', initiate:'Iniciar transferencia', verifying:'Verificando sus credenciales...', processing:'Procesando transferencia...', confirm:'Confirmar importe', selectPlaceholder:'Seleccione el país de destino', advisory:'<b>Aviso de seguridad</b> Nunca comparta su PIN con nadie. Banco Global Trust nunca pedirá su PIN por mensaje.', receiptTitle:'RECIBO DE TRANSFERENCIA', receiptSuccess:'TRANSFERENCIA EXITOSA', receiptRefNum:'Número de referencia:', receiptDate:'Fecha:', receiptTime:'Hora:', receiptFrom:'De:', receiptTo:'Para:', successMsg:(user,amt,name)=>`¡Transferencia de $${amt} a ${name} realizada con éxito!`, insufficientBalance:'Saldo insuficiente', insufficientMsg:'No tiene suficiente saldo para completar esta transferencia.', help:'Centro de ayuda GTB', twofaSent:'Se ha enviado un código de verificación a su dispositivo registrado.', twofaSentDemo:'(Demo: use "Reenviar código" para mostrar el código 2FA.)', sessionExpiring:'Su sesión está a punto de expirar por inactividad.', keepSigned:'Mantener sesión iniciada', destNames:{} },
+        fr: { head:'BANQUE GLOBAL TRUST', login:"Se connecter", user:'Nom d\'utilisateur', pass:'Code PIN', auth:'Connexion sécurisée', transfer:'Transférer', save:'Déposer', cash:'Retirer', exit:'Déconnexion', history:'Journal d\'activité', beneficiary:'Nom du bénéficiaire', accNum:'Numéro de compte', bank:'Banque', amt:'Montant ($)', initiate:'Lancer le virement', verifying:'Vérification de vos identifiants...', processing:'Traitement du virement...', confirm:'Confirmer le montant', selectPlaceholder:'Sélectionnez le pays de destination', advisory:'<b>Avertissement de sécurité</b> Ne partagez jamais votre code PIN. La Banque Global Trust ne demandera jamais votre PIN par message.', receiptTitle:'REÇU DE VIREMENT', receiptSuccess:'VIREMENT RÉUSSI', receiptRefNum:'Numéro de référence:', receiptDate:'Date:', receiptTime:'Heure:', receiptFrom:'De:', receiptTo:'À:', successMsg:(user,amt,name)=>`Virement de $${amt} vers ${name} réussi !`, insufficientBalance:'Solde insuffisant', insufficientMsg:'Vous n\'avez pas assez de solde pour effectuer ce virement.', help:'Centre d\'aide GTB', twofaSent:'Un code de vérification a été envoyé à votre appareil enregistré.', twofaSentDemo:'(Demo: utilisez "Renvoyer le code" pour afficher le code 2FA.)', sessionExpiring:'Votre session est sur le point d\'expirer en raison de l\'inactivité.', keepSigned:'Rester connecté', destNames:{} },
+        de: { head:'GLOBAL TRUST BANK', login:'Anmelden', user:'Benutzername', pass:'PIN', auth:'Sicher anmelden', transfer:'Überweisen', save:'Einzahlen', cash:'Abheben', exit:'Abmelden', history:'Aktivitätsprotokoll', beneficiary:'Begünstigter Name', accNum:'Kontonummer', bank:'Bank', amt:'Betrag ($)', initiate:'Überweisung ausführen', verifying:'Überprüfe Ihre Anmeldedaten...', processing:'Bearbeite Überweisung...', confirm:'Betrag bestätigen', selectPlaceholder:'Zielland wählen', advisory:'<b>Sicherheitshinweis</b> Geben Sie Ihren PIN niemals weiter. Global Trust Bank fragt niemals per Nachricht nach Ihrem PIN.', receiptTitle:'ÜBERWEISUNGSBELEG', receiptSuccess:'ÜBERWEISUNG ERFOLGREICH', receiptRefNum:'Referenznummer:', receiptDate:'Datum:', receiptTime:'Uhrzeit:', receiptFrom:'Von:', receiptTo:'An:', successMsg:(user,amt,name)=>`Überweisung von $${amt} an ${name} erfolgreich!`, insufficientBalance:'Unzureichendes Guthaben', insufficientMsg:'Sie haben nicht genügend Guthaben, um diese Überweisung abzuschließen.', help:'GTB Hilfezentrum', twofaSent:'Ein Bestätigungscode wurde an Ihr registriertes Gerät gesendet.', twofaSentDemo:'(Demo: verwenden Sie "Code erneut senden", um den 2FA-Code anzuzeigen.)', sessionExpiring:'Ihre Sitzung läuft aufgrund von Inaktivität bald ab.', keepSigned:'Angemeldet bleiben', destNames:{} },
+        pt: { head:'BANCO GLOBAL TRUST', login:'Entrar', user:'Nome de usuário', pass:'PIN de acesso', auth:'Entrar com segurança', transfer:'Transferir', save:'Depositar', cash:'Sacar', exit:'Sair', history:'Registro de atividades', beneficiary:'Nome do beneficiário', accNum:'Número da conta', bank:'Banco', amt:'Valor ($)', initiate:'Iniciar transferência', verifying:'Verificando suas credenciais...', processing:'Processando transferência...', confirm:'Confirmar valor', selectPlaceholder:'Selecione o país de destino', advisory:'<b>Aviso de segurança</b> Nunca compartilhe seu PIN com ninguém. O Banco Global Trust nunca solicitará seu PIN por mensagem.', receiptTitle:'RECIBO DE TRANSFERÊNCIA', receiptSuccess:'TRANSFERÊNCIA BEM-SUCEDIDA', receiptRefNum:'Número de referência:', receiptDate:'Data:', receiptTime:'Hora:', receiptFrom:'De:', receiptTo:'Para:', successMsg:(user,amt,name)=>`Transferência de $${amt} para ${name} concluída com sucesso!`, insufficientBalance:'Saldo insuficiente', insufficientMsg:'Você não tem saldo suficiente para concluir esta transferência.', help:'Central de ajuda GTB', twofaSent:'Um código de verificação foi enviado para seu dispositivo registrado.', twofaSentDemo:'(Demo: use "Reenviar código" para exibir o código 2FA.)', sessionExpiring:'Sua sessão está prestes a expirar devido à inatividade.', keepSigned:'Manter-me conectado', destNames:{} },
+        id: { head:'GLOBAL TRUST BANK', login:'Masuk', user:'Nama pengguna', pass:'PIN akses', auth:'Masuk dengan aman', transfer:'Transfer', save:'Simpan', cash:'Tarik', exit:'Keluar', history:'Riwayat aktivitas', beneficiary:'Nama penerima', accNum:'Nomor rekening', bank:'Bank', amt:'Jumlah ($)', initiate:'Mulai transfer', verifying:'Memverifikasi kredensial Anda...', processing:'Memproses transfer...', confirm:'Konfirmasi jumlah', selectPlaceholder:'Pilih negara tujuan', advisory:'<b>Pemberitahuan keamanan</b> Jangan pernah membagikan PIN Anda. Global Trust Bank tidak akan meminta PIN melalui pesan.', receiptTitle:'BUKTI TRANSFER', receiptSuccess:'TRANSFER BERHASIL', receiptRefNum:'Nomor referensi:', receiptDate:'Tanggal:', receiptTime:'Waktu:', receiptFrom:'Dari:', receiptTo:'Kepada:', successMsg:(user,amt,name)=>`Transfer $${amt} ke ${name} berhasil!`, insufficientBalance:'Saldo tidak cukup', insufficientMsg:'Saldo Anda tidak mencukupi untuk menyelesaikan transfer ini.', help:'Pusat bantuan GTB', twofaSent:'Kode verifikasi telah dikirim ke perangkat terdaftar Anda.', twofaSentDemo:'(Demo: gunakan "Kirim ulang kode" untuk menampilkan kode 2FA.)', sessionExpiring:'Sesi Anda akan segera kedaluwarsa karena tidak aktif.', keepSigned:'Biarkan saya tetap masuk', destNames:{} }
     };
 
     function getTranslationDictionary(countryCode){return langData[countryCode]||langData['en']}
@@ -195,12 +263,17 @@
     // Heuristic gender detection
     function guessGenderFromName(name){if(!name)return'other';const first=name.trim().split(/\s+/)[0].toLowerCase();const female=new Set(['mary','anna','sarah','jennifer','elizabeth','emily','emma','olivia','isabella','maria','laura','linda','rachel','lisa','sara','clara','sophia','karen','nicole','lola','mila']);if(female.has(first))return'female';const last=first.slice(-1);if(last==='a'||last==='e'||first.endsWith('ie'))return'female';return'male'}
 
-    function showLoadingOverlay(message){const overlay=document.createElement('div');overlay.className='loading-overlay';overlay.id='activeOverlay';overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999';overlay.innerHTML=`<img src="File_000000009678724680189a55ffec1a9b.png" style="width:110px;border-radius:12px;margin-bottom:18px"><p style="margin-top:20px;font-weight:700;color:#0f172a">${message}</p>`;document.body.appendChild(overlay)}
+    function showLoadingOverlay(message){const overlay=document.createElement('div');overlay.className='overlay';overlay.id='activeOverlay';overlay.innerHTML=`<div class="card"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:110px;border-radius:12px;margin-bottom:18px"><p style="margin-top:20px;font-weight:700;color:#0f172a">${message}</p></div>`;document.body.appendChild(overlay)}
     function removeLoadingOverlay(){const el=document.getElementById('activeOverlay');if(el)el.remove()}
 
-    function showNotification(msg){const overlay=document.createElement('div');overlay.className='notification-overlay';overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);display:flex;justify-content:center;align-items:center;z-index:10000';overlay.id='notifyOverlay';overlay.innerHTML=`<div class="card" style="width:92%;max-width:420px;text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:72px;margin-bottom:12px;border-radius:12px"><p style="font-size:15px;font-weight:700">${msg}</p><button style="margin-top:12px" onclick="document.getElementById('notifyOverlay').remove()">OK</button></div>`;document.body.appendChild(overlay)}
+    function showNotification(msg){const overlay=document.createElement('div');overlay.className='overlay';overlay.id='notifyOverlay';overlay.innerHTML=`<div class="card"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:72px;margin-bottom:12px;border-radius:12px"><p style="font-size:15px;font-weight:700">${msg}</p><button style="margin-top:12px" onclick="document.getElementById('notifyOverlay').remove()">OK</button></div>`;document.body.appendChild(overlay)}
 
     window.onload=loadDropdownOptions;
+
+    // Persisted profile helpers (localStorage keyed per username)
+    function profileKey(username){return 'gtb_profile_' + username}
+    function saveProfile(username, profile){localStorage.setItem(profileKey(username), JSON.stringify(profile))}
+    function loadProfile(username){try{return JSON.parse(localStorage.getItem(profileKey(username)))||{}}catch(e){return {}}}
 
     function doLogin(){
         const selectedCountry=document.getElementById('language').value; if(!selectedCountry){alert('Please select a language first');return}
@@ -208,40 +281,119 @@
         if(inputPin===correctPin){
             loggedInUser=document.getElementById('username').value.trim()||'Valued Client';
             const override=document.getElementById('genderOverride').value; detectedGender=override||guessGenderFromName(loggedInUser);
+            // If user has a persisted profile with title preference, use it
+            const existing=loadProfile(loggedInUser);
+            if(existing && existing.title){
+                detectedGender = existing.title === 'male' ? 'male' : (existing.title === 'female' ? 'female' : 'other');
+            }
+
             showLoadingOverlay(d.verifying||'Verifying...');
             setTimeout(()=>{removeLoadingOverlay();
-                // splash greeting
-                const splash=document.createElement('div');splash.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998';
-                const titleText=(detectedGender==='female')?'Ms.':(detectedGender==='male'?'Mr.':'');
-                const honor=titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`;
-                splash.innerHTML=`<img src="File_000000009678724680189a55ffec1a9b.png" style="width:140px;height:140px;object-fit:cover;border-radius:12px;margin-bottom:18px"><p style="font-size:18px;color:#64748b;margin:0">${d.head}</p><p style="font-size:20px;font-weight:700;color:#0f172a;margin-top:12px">${honor}</p><p style="font-size:15px;color:#475569;margin-top:8px">Welcome to your Shaun Gray charity account</p>`;
-                document.body.appendChild(splash);
-                setTimeout(()=>{splash.remove();
-                    // show dashboard but keep balance hidden until user reveals it
-                    document.getElementById('login').classList.add('hidden');
-                    document.getElementById('dashboard').classList.remove('hidden');
-                    balanceHidden=true; updateBalanceDisplay();
-                    const titleDash=(detectedGender==='female')?'Ms.':(detectedGender==='male'?'Mr.':'');
-                    document.getElementById('greetingText').innerText= titleDash ? `Dear ${titleDash} ${loggedInUser}` : `Dear ${loggedInUser}`;
-                    document.getElementById('subGreeting').innerText='Welcome to your Shaun Gray charity account';
-                    applyDashboardLang(); loadHistory();
-                },1800);
-            },1200);
+                // Instead of immediately showing dashboard, require mock 2FA
+                start2FA();
+            },800);
         } else { alert('Invalid PIN for this region.'); }
     }
 
+    // 2FA mock: generate code and show overlay. For demo, Resend displays the code so you can enter it.
+    function start2FA(){
+        generated2FACode = String(Math.floor(100000 + Math.random()*900000));
+        document.getElementById('twofaOverlay').classList.remove('hidden');
+        // show a small message for demo languages
+        const d = getTranslationDictionary(selectedLanguageCode);
+        // Informational notification (non-blocking) - instruct user where code was sent
+        showNotification(d.twofaSent + '\n\n' + d.twofaSentDemo);
+    }
+    function resend2FA(){
+        generated2FACode = String(Math.floor(100000 + Math.random()*900000));
+        // For demo show code in notification so testers can type it
+        showNotification('Demo 2FA code: ' + generated2FACode);
+    }
+    function verify2FA(){
+        const val = document.getElementById('twofaCodeInput').value.trim();
+        if(val === generated2FACode){
+            document.getElementById('twofaOverlay').classList.add('hidden');
+            generated2FACode = null;
+            afterSuccessfulLogin();
+        } else { alert('Invalid verification code. Use "Resend code" to get a demo code.'); }
+    }
+
+    function afterSuccessfulLogin(){
+        const d = getTranslationDictionary(selectedLanguageCode);
+        // record last-login info (persist previous and current)
+        const now = new Date();
+        const device = navigator.userAgent;
+        const profile = loadProfile(loggedInUser) || {};
+        profile.previousLogin = profile.lastLogin || null;
+        profile.previousDevice = profile.lastDevice || null;
+        profile.lastLogin = now.toISOString();
+        profile.lastDevice = device;
+        // persist selected title choice
+        const userTitleChoice = document.getElementById('genderOverride').value || profile.title || (detectedGender === 'female' ? 'female' : (detectedGender === 'male' ? 'male' : 'other'));
+        profile.title = userTitleChoice;
+        saveProfile(loggedInUser, profile);
+
+        // polite splash
+        const splash=document.createElement('div');splash.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998';
+        const titleText = profile.title === 'female' ? 'Ms.' : (profile.title === 'male' ? 'Mr.' : '');
+        const honor = titleText ? `Dear ${titleText} ${loggedInUser}` : `Dear ${loggedInUser}`;
+        splash.innerHTML = `<img src="File_000000009678724680189a55ffec1a9b.png" style="width:140px;height:140px;object-fit:cover;border-radius:12px;margin-bottom:18px"><p style="font-size:18px;color:#64748b;margin:0">${d.head}</p><p style="font-size:20px;font-weight:700;color:#0f172a;margin-top:12px">${honor}</p><p style="font-size:15px;color:#475569;margin-top:8px">Welcome to your Shaun Gray charity account</p>`;
+        document.body.appendChild(splash);
+        setTimeout(()=>{splash.remove();
+            // show dashboard
+            document.getElementById('login').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            balanceHidden = true; updateBalanceDisplay();
+            document.getElementById('greetingText').innerText = titleText ? `Dear ${titleText} ${loggedInUser}` : `Dear ${loggedInUser}`;
+            document.getElementById('subGreeting').innerText = 'Welcome to your Shaun Gray charity account';
+            applyDashboardLang(); loadHistory();
+            populateSettingsFromProfile();
+            startSessionTimer();
+        },1200);
+    }
+
+    function populateSettingsFromProfile(){
+        const p = loadProfile(loggedInUser) || {};
+        document.getElementById('settingsTitle').value = p.title || '';
+        const last = p.previousLogin ? new Date(p.previousLogin) : null;
+        if(last){ document.getElementById('lastLoginDisplay').innerText = 'Previous: ' + last.toLocaleString(); } else { document.getElementById('lastLoginDisplay').innerText = 'No previous login recorded'; }
+        document.getElementById('lastDeviceDisplay').innerText = p.previousDevice ? `Previous device: ${truncateDevice(p.previousDevice)}` : '';
+    }
+
+    function truncateDevice(str){ if(!str) return ''; return str.split(')')[0] + ')' }
+
+    //  Session timer helpers
+    function startSessionTimer(){
+        clearSessionTimers();
+        const timeout = SESSION_TIMEOUT_MS;
+        sessionWarningTimer = setTimeout(()=>{ showSessionWarning(); }, timeout - SESSION_WARNING_MS);
+        sessionTimer = setTimeout(()=>{ endSession(); }, timeout);
+        // attach activity listeners
+        ['mousemove','keydown','click','scroll'].forEach(ev => window.addEventListener(ev, resetSessionTimer));
+    }
+    function resetSessionTimer(){ clearSessionTimers(); startSessionTimer(); }
+    function clearSessionTimers(){ if(sessionTimer) clearTimeout(sessionTimer); if(sessionWarningTimer) clearTimeout(sessionWarningTimer); }
+    function showSessionWarning(){ document.getElementById('sessionWarning').classList.remove('hidden'); }
+    function extendSession(){ document.getElementById('sessionWarning').classList.add('hidden'); resetSessionTimer(); }
+    function endSession(){ // log user out
+        clearSessionTimers(); document.getElementById('sessionWarning').classList.add('hidden'); document.getElementById('dashboard').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); // clear sensitive fields
+        document.getElementById('password').value=''; document.getElementById('username').value=''; document.getElementById('genderOverride').value=''; loggedInUser='';
+        // remove activity listeners
+        ['mousemove','keydown','click','scroll'].forEach(ev => window.removeEventListener(ev, resetSessionTimer));
+        showNotification('You have been signed out due to inactivity.');
+    }
+
     function updateBalanceDisplay(){const el=document.getElementById('balance');const eye=document.getElementById('eyeIcon');if(balanceHidden){el.innerText='•••••••';eye.innerText='🙈'}else{el.innerText='$'+balance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});eye.innerText='👁️'}}
+    function toggleBalance(){balanceHidden=!balanceHidden;updateBalanceDisplay();resetSessionTimer()}
 
-    function toggleBalance(){balanceHidden=!balanceHidden;updateBalanceDisplay()}
-
-    function applyDashboardLang(){const c=selectedLanguageCode;const d=getTranslationDictionary(c);document.getElementById('navTransfer').innerText=d.transfer||'Transfer';document.getElementById('navDeposit').innerText=d.save||'Deposit';document.getElementById('navWithdraw').innerText=d.cash||'Withdraw';document.getElementById('navExit').innerText=d.exit||'Sign out';document.getElementById('tTitle').innerText=d.transfer||'Funds Transfer';document.getElementById('hTitle').innerText=d.history||'Activity log';document.getElementById('receiver').placeholder=d.beneficiary||'Beneficiary name';document.getElementById('accountNum').placeholder=d.accNum||'Account number';document.getElementById('bank').placeholder=d.bank||'Bank';document.getElementById('amount').placeholder=d.amt||'Amount ($)';document.getElementById('btnInitiate').innerText=d.initiate||'Initiate transfer';document.getElementById('helpText').innerText=d.help||'GTB Help Center'}
+    function applyDashboardLang(){const c=selectedLanguageCode||'en';const d=getTranslationDictionary(c);document.getElementById('navTransfer').innerText=d.transfer||'Transfer';document.getElementById('navDeposit').innerText=d.save||'Deposit';document.getElementById('navWithdraw').innerText=d.cash||'Withdraw';document.getElementById('navSettings').innerText='Settings';document.getElementById('tTitle').innerText=d.transfer||'Funds Transfer';document.getElementById('hTitle').innerText=d.history||'Activity log';document.getElementById('receiver').placeholder=d.beneficiary||'Beneficiary name';document.getElementById('accountNum').placeholder=d.accNum||'Account number';document.getElementById('bank').placeholder=d.bank||'Bank';document.getElementById('amount').placeholder=d.amt||'Amount ($)';document.getElementById('btnInitiate').innerText=d.initiate||'Initiate transfer';document.getElementById('helpText').innerText=d.help||'GTB Help Center'}
 
     function getFormattedDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
     function getFormattedDateTimeInTimezone(dateObj,countryCode){const tz=countryTimezones[countryCode]||'UTC';const f=new Intl.DateTimeFormat('en-US',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:tz});const parts=f.formatToParts(dateObj);const map={};parts.forEach(p=>map[p.type]=p.value);return `${map.month}/${map.day}/${map.year} ${map.hour}:${map.minute} ${map.dayperiod}`} 
 
     function loadHistory(){const list=document.getElementById('history');list.innerHTML='';const d1=new Date(2020,5,7),d2=new Date(2020,5,5),d3=new Date(2020,5,3);const items=[{n:'St. Jude Research',a:250000,d:getFormattedDate(d1)},{n:'Red Cross Relief',a:150000,d:getFormattedDate(d2)},{n:'UNICEF Foundation',a:100000,d:getFormattedDate(d3)}];items.forEach(item=>{const li=document.createElement('li');li.innerHTML=`<div><small style="color:#94a3b8">${item.d}</small><br><strong>${item.n}</strong></div><span style="color:#e11d48">-$${item.a.toLocaleString()}</span>`;list.appendChild(li)})}
 
-    function showBox(id){document.getElementById('transferBox').classList.add('hidden');document.getElementById('receiptBox').classList.add('hidden');const el=document.getElementById(id);if(el)el.classList.remove('hidden')}
+    function showBox(id){document.getElementById('transferBox').classList.add('hidden');document.getElementById('receiptBox').classList.add('hidden');document.getElementById('settingsBox').classList.add('hidden');const el=document.getElementById(id);if(el)el.classList.remove('hidden');resetSessionTimer()}
 
     function formatCurrency(input){let v=input.value.replace(/[^0-9.]/g,'');if(v===''){input.value='';return}let parts=v.split('.');parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');input.value=parts.join('.')} 
 
@@ -251,7 +403,24 @@
 
     function generateRealReceipt(name,amt,timestampObj,country){const d=getTranslationDictionary(selectedLanguageCode);const rBox=document.getElementById('receiptBox');const refNum='GTB-'+Math.floor(Math.random()*1e9);const receiptDateTime=getFormattedDateTimeInTimezone(timestampObj,selectedLanguageCode);const receiptDate=receiptDateTime.split(' ').slice(0,1).join(' ');const receiptTime=receiptDateTime.split(' ').slice(1).join(' ');rBox.classList.remove('hidden');rBox.innerHTML=`<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:54px;margin-bottom:8px;border-radius:10px"><div style="font-weight:800;margin-top:6px">${d.receiptTitle||'TRANSFER RECEIPT'}</div><div class="success-badge" style="background:#ecfdf5;color:#065f46;padding:6px 12px;border-radius:12px;margin-top:8px;border:1px solid #bbf7d0">${d.receiptSuccess||'TRANSFER SUCCESSFUL'}</div></div><div class="receipt-body"><div class="receipt-row"><span>${d.receiptRefNum||'Reference Number:'}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.receiptDate||'Date:'}</span><b>${receiptDate}</b></div><div class="receipt-row"><span>${d.receiptTime||'Time:'}</span><b>${receiptTime}</b></div><div class="receipt-row"><span>${d.receiptFrom||'From:'}</span><b>${loggedInUser}</b></div><div class="receipt-row"><span>${d.receiptTo||'To:'}</span><b>${name}</b></div><div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</b></div></div><div class="receipt-footer">This is a demo receipt for the Shaun Gray charity account.</div></div>`;rBox.scrollIntoView({behavior:'smooth'})}
 
-    function logout(){document.getElementById('dashboard').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('username').value='';document.getElementById('password').value='';document.getElementById('genderOverride').value='';}
+    function saveSettings(){
+        const title = document.getElementById('settingsTitle').value || '';
+        const p = loadProfile(loggedInUser) || {};
+        p.title = title;
+        saveProfile(loggedInUser, p);
+        showNotification('Settings saved locally.');
+        populateSettingsFromProfile();
+        resetSessionTimer();
+    }
+    function resetSettings(){document.getElementById('settingsTitle').value='';const p = loadProfile(loggedInUser)||{};delete p.title;saveProfile(loggedInUser,p);showNotification('Settings reset');populateSettingsFromProfile();resetSessionTimer()}
+
+    function logout(){endSession()}
+
+    // Simple helpers
+    function profileKey(username){return 'gtb_profile_' + username}
+    function saveProfile(username, profile){localStorage.setItem(profileKey(username), JSON.stringify(profile))}
+    function loadProfile(username){try{return JSON.parse(localStorage.getItem(profileKey(username)))||{}}catch(e){return {}}}
+
 </script>
 
 </body>
