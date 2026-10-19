@@ -63,7 +63,7 @@
             <select id="genderOverride" style="margin-top:10px">
                 <option value="">Auto-detect title</option>
                 <option value="male">Mr.</option>
-                <option value="female">Ms.</option>
+                <option value="female">Mrs.</option>
                 <option value="other">Prefer not to say</option>
             </select>
 
@@ -74,7 +74,6 @@
             <small style="display:block;margin-top:10px;color:#64748b">Secure sign-in — never share your PIN.</small>
         </div>
 
-        <!-- About section removed as requested -->
     </div>
 
     <!-- Right: Dashboard -->
@@ -99,100 +98,198 @@
                 <div class="action-icon" onclick="location.reload()"><img src="https://img.icons8.com/ios-filled/50/4f46e5/shutdown.png"><div id="navExit">Exit</div></div>
             </div>
 
-            <div id="transferBox" class="card hidden">
+            <div id="transferBox" class="card hidden" style="margin-top:14px">
                 <h4 id="tTitle">Funds Transfer</h4>
-                <input id="receiver" placeholder="Beneficiary Name">
-                <input id="accountNum" placeholder="Account Number">
-                <select id="transferCountry">
-                    <option value="" id="selectPlaceholder" disabled selected>Select Destination Country</option>
+                <input id="receiver" placeholder="Beneficiary name">
+                <input id="accountNum" placeholder="Account number" style="margin-top:10px">
+                <select id="transferCountry" style="margin-top:10px">
+                    <option value="" id="selectPlaceholder" disabled selected>Select destination country</option>
                 </select>
-                <input id="bank" placeholder="Bank">
-                <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)">
-                <button onclick="preTransfer()" id="btnInitiate">Transfer Now</button>
+                <input id="bank" placeholder="Bank" style="margin-top:10px">
+                <input id="amount" type="text" placeholder="Amount ($)" oninput="formatCurrency(this)" style="margin-top:10px">
+                <button onclick="preTransfer()" id="btnInitiate" style="margin-top:10px">Initiate transfer</button>
                 <div id="transferPreview"></div>
             </div>
 
-            <!-- Other UI sections unchanged -->
+            <div id="settingsBox" class="card hidden" style="margin-top:14px">
+                <h4>Account settings</h4>
+                <div style="margin-top:8px" class="small muted">Change your title and review recent login info for this account.</div>
+                <div style="margin-top:12px">
+                    <label class="small">Title</label>
+                    <select id="settingsTitle" style="margin-top:8px">
+                        <option value="">Auto-detect title</option>
+                        <option value="male">Mr.</option>
+                        <option value="female">Mrs.</option>
+                        <option value="other">Prefer not to say</option>
+                    </select>
+                </div>
+                <div style="margin-top:12px">
+                    <label class="small">Last login</label>
+                    <div id="lastLoginDisplay" class="muted" style="margin-top:6px">—</div>
+                    <div id="lastDeviceDisplay" class="muted small" style="margin-top:6px">—</div>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                    <button onclick="saveSettings()">Save settings</button>
+                    <button onclick="resetSettings()" style="background:#94a3b8">Reset</button>
+                </div>
+                <div style="margin-top:12px" class="muted small">Settings are stored locally in your browser for this account.</div>
+            </div>
 
+            <div id="receiptBox" class="card hidden" style="margin-top:14px;padding:0;background:transparent;box-shadow:none"></div>
+
+            <div class="card" style="margin-top:14px">
+                <h4 id="hTitle">Activity log</h4>
+                <ul id="history"></ul>
+            </div>
+
+            <button class="helpBtn" onclick="window.open('https://wa.me/12792843484')"><img src="https://img.icons8.com/ios-filled/24/ffffff/info.png" alt="help"> <span id="helpText">GTB Help Center</span></button>
         </div>
     </div>
 </div>
 
 <script>
-// Basic client-side logic (kept minimal and functional)
-function setLanguage(){ /* stub - preserved */ }
+    // Demo state
+    let balance = 55000.00;
+    const transferPin = '2468';
+    let balanceHidden = false;
+    let loggedInUser = '';
+    let selectedLanguageCode = '';
+    let detectedGender = '';
 
-function showBox(id){
-    document.querySelectorAll('.card').forEach(c=>{ if(c.id && c.id!== 'login' && c.id!=='dashboard'){ c.classList.add('hidden'); }});
-    const el = document.getElementById(id);
-    if(el) el.classList.remove('hidden');
-}
+    const countryTimezones = { en:'America/New_York', id:'Asia/Jakarta', ms:'Asia/Kuala_Lumpur', pt:'America/Sao_Paulo', th:'Asia/Bangkok', es:'Europe/Madrid', de:'Europe/Berlin', ar:'Asia/Riyadh', fr:'Europe/Paris', it:'Europe/Rome', ja:'Asia/Tokyo', da:'Europe/Copenhagen', no:'Europe/Oslo', fil:'Asia/Manila', pl:'Europe/Warsaw', tr:'Europe/Istanbul', tet:'Asia/Dili', vi:'Asia/Ho_Chi_Minh', gb:'Europe/London' };
 
-function toggleBalance(){
-    const b = document.getElementById('balance');
-    if(!b) return;
-    // Toggle visibility by replacing content with masked form and back
-    if(b.dataset.hidden === 'true'){
-        b.textContent = b.dataset.value || '$55,000.00';
-        b.dataset.hidden = 'false';
-    } else {
-        // mask
-        b.dataset.value = b.textContent;
-        b.textContent = '$*****.**';
-        b.dataset.hidden = 'true';
+    const countryPins = { en:'444111', id:'444222', ms:'444333', pt:'444555', th:'444666', es:'444777', de:'444888', ar:'444999', fr:'555111', it:'555222', ja:'555333', da:'555555', pl:'555666', no:'666666', fil:'666777', tr:'555999', tet:'666222', vi:'666111', gb:'777777' };
+
+    const countryDropdownOptions = [
+        {code:'en',flag:'🇺🇸',name:'United States',langCode:'en'},
+        {code:'id',flag:'🇮🇩',name:'Indonesia',langCode:'id'},
+        {code:'ms',flag:'🇲🇾',name:'Malaysia',langCode:'ms'},
+        {code:'pt',flag:'🇧🇷',name:'Brazil',langCode:'pt'},
+        {code:'th',flag:'🇹🇭',name:'Thailand',langCode:'th'},
+        {code:'es',flag:'🇪🇸',name:'Spain',langCode:'es'},
+        {code:'en',flag:'🇦🇺',name:'Australia',langCode:'en'},
+        {code:'es',flag:'🇦🇷',name:'Argentina',langCode:'es'},
+        {code:'de',flag:'🇦🇹',name:'Austria',langCode:'de'},
+        {code:'en',flag:'🇧🇿',name:'Belize',langCode:'en'},
+        {code:'ms',flag:'🇧🇳',name:'Brunei',langCode:'ms'},
+        {code:'en',flag:'🇨🇦',name:'Canada',langCode:'en'},
+        {code:'da',flag:'🇩🇰',name:'Denmark',langCode:'da'},
+        {code:'es',flag:'🇩🇴',name:'Dominican Republic',langCode:'es'},
+        {code:'es',flag:'🇪🇨',name:'Ecuador',langCode:'es'},
+        {code:'fr',flag:'🇫🇷',name:'France',langCode:'fr'},
+        {code:'de',flag:'🇩🇪',name:'Germany',langCode:'de'},
+        {code:'it',flag:'🇮🇹',name:'Italy',langCode:'it'},
+        {code:'ja',flag:'🇯🇵',name:'Japan',langCode:'ja'},
+        {code:'ar',flag:'🇰🇼',name:'Kuwait',langCode:'ar'},
+        {code:'fr',flag:'🇱🇺',name:'Luxembourg',langCode:'fr'},
+        {code:'es',flag:'🇲🇽',name:'Mexico',langCode:'es'},
+        {code:'no',flag:'🇳🇴',name:'Norway',langCode:'no'},
+        {code:'fil',flag:'🇵🇭',name:'Philippines',langCode:'fil'},
+        {code:'pl',flag:'🇵🇱',name:'Poland',langCode:'pl'},
+        {code:'es',flag:'🇵🇦',name:'Panama',langCode:'es'},
+        {code:'pt',flag:'🇵🇹',name:'Portugal',langCode:'pt'},
+        {code:'ar',flag:'🇶🇦',name:'Qatar',langCode:'ar'},
+        {code:'de',flag:'🇨🇭',name:'Switzerland',langCode:'de'},
+        {code:'en',flag:'🇸🇬',name:'Singapore',langCode:'en'},
+        {code:'tr',flag:'🇹🇷',name:'Turkiye',langCode:'tr'},
+        {code:'tet',flag:'🇹🇱',name:'Timor-Leste',langCode:'tet'},
+        {code:'gb',flag:'🇬🇧',name:'United Kingdom',langCode:'gb'},
+        {code:'vi',flag:'🇻🇳',name:'Vietnam',langCode:'vi'}
+    ];
+
+    // Translation dictionary for several languages
+    const langData = {
+        en: { head:'GLOBAL TRUST BANK', login:'Sign in', user:'Username', pass:'Access PIN', auth:'Sign in securely', transfer:'Transfer', save:'Deposit', cash:'Withdraw', exit:'Sign out', history:'Activity log', beneficiary:'Beneficiary name', accNum:'Account number', bank:'Bank', amt:'Amount ($)', initiate:'Initiate transfer', verifying:'Verifying...', processing:'Processing transaction...', confirm:'Confirm amount', selectPlaceholder:'Select destination country', advisory:'<b>Security notice</b> Never share your PIN. Global Trust Bank will never ask for your PIN over email or phone.', receiptTitle:'TRANSFER RECEIPT', receiptSuccess:'TRANSFER SUCCESSFUL', receiptRefNum:'Reference number:', receiptDate:'Date:', receiptTime:'Time:', receiptFrom:'From:', receiptTo:'To:', successMsg:(u,a,n)=>`Transfer of $${a} to ${n} successful!`, insufficientBalance:'Insufficient balance', insufficientMsg:'You do not have enough balance to complete this transfer.', help:'GTB Help Center', destNames:{} },
+        es: { head:'BANCO GLOBAL TRUST', login:'Iniciar sesión', user:'Usuario', pass:'PIN de acceso', auth:'Iniciar sesión de forma segura', transfer:'Transferir', save:'Depositar', cash:'Retirar', exit:'Salir', history:'Historial', beneficiary:'Nombre del beneficiario', accNum:'Número de cuenta', bank:'Banco', amt:'Importe ($)', initiate:'Iniciar transferencia', verifying:'Verificando...', processing:'Procesando...', confirm:'Confirmar importe', selectPlaceholder:'Seleccione país', advisory:'<b>Aviso de seguridad</b> No comparta su PIN.', receiptTitle:'COMPROBANTE', receiptSuccess:'TRANSFERENCIA EXITOSA', receiptRefNum:'Nº de referencia:', receiptDate:'Fecha:', receiptTime:'Hora:', receiptFrom:'De:', receiptTo:'Para:', successMsg:(u,a,n)=>`¡Transferencia de $${a} a ${n} realizada!`, insufficientBalance:'Saldo insuficiente', insufficientMsg:'No tiene suficiente saldo para completar la transferencia.', help:'Centro de ayuda GTB', destNames:{} }
+    };
+
+    function getTranslationDictionary(countryCode){return langData[countryCode]||langData['en']}
+
+    function loadDropdownOptions(){
+        const sel=document.getElementById('language');
+        sel.innerHTML='<option value="" disabled selected style="color:#94a3b8">Select language</option>';
+        countryDropdownOptions.forEach(opt=>{const el=document.createElement('option');el.value=opt.langCode;el.innerText=`${opt.flag} ${opt.name}`;sel.appendChild(el)});
+        sel.value='en'; selectedLanguageCode='en'; setLanguage();
     }
-}
 
-function doLogin(){
-    const user = document.getElementById('username').value.trim();
-    if(!user){ alert('Please enter your username'); return; }
-    // simple PIN check — keep site functional but no demo text
-    const pin = document.getElementById('password').value.trim();
-    // accept any non-empty PIN in this front-end demo, but require it
-    if(!pin){ alert('Please enter your access PIN'); return; }
+    function updateTransferSelector(){
+        const c=document.getElementById('language').value;const d=getTranslationDictionary(c);const t=document.getElementById('transferCountry');const placeholder=document.getElementById('selectPlaceholder');
+        placeholder.innerText=d.selectPlaceholder||'Select destination country';
+        while(t.options.length>1) t.remove(1);
+        countryDropdownOptions.forEach(opt=>{const el=document.createElement('option');el.value=opt.name;el.innerText = d.destNames[opt.name] || opt.name; t.appendChild(el)});
+    }
 
-    // Prepare greeting
-    const gender = document.getElementById('genderOverride').value;
-    let title = '';
-    if(gender === 'male') title = 'Dear, Mr ';
-    else if(gender === 'female') title = 'Dear, Mrs ';
-    else title = 'Dear ';
-    document.getElementById('greetingText').textContent = title + user + ' — welcome to Shaun Gray charity account';
+    function setLanguage(){const c=document.getElementById('language').value;if(!c)return;selectedLanguageCode=c;const d=getTranslationDictionary(c);document.getElementById('mainHeader').querySelector('span').innerText=d.head;document.getElementById('loginTitle').innerText=d.login;document.getElementById('username').placeholder=d.user;document.getElementById('password').placeholder=d.pass;document.getElementById('loginBtn').innerText=d.auth;document.getElementById('securityBanner').innerHTML=d.advisory;updateTransferSelector();}
 
-    // Show dashboard and ensure balance is visible
-    document.getElementById('login').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    const b = document.getElementById('balance');
-    b.textContent = '$55,000.00';
-    b.dataset.hidden = 'false';
-    b.dataset.value = '$55,000.00';
-}
+    window.onload=loadDropdownOptions;
 
-function formatCurrency(inp){
-    // basic numeric filter
-    const v = inp.value.replace(/[^0-9\.]/g,'');
-    inp.value = v;
-}
+    // Heuristic gender detection from name
+    function guessGenderFromName(name){ if(!name) return 'other'; const first = name.trim().split(/\s+/)[0].toLowerCase(); const female = new Set(['mary','anna','sarah','jennifer','elizabeth','emily','emma','sophia','isabella','mia']); const male = new Set(['john','mike','michael','robert','david','james','william','alex','alexander','luke']); if(female.has(first)) return 'female'; if(male.has(first)) return 'male'; return 'other'; }
 
-function preTransfer(){
-    const receiver = document.getElementById('receiver').value.trim();
-    const accountNum = document.getElementById('accountNum').value.trim();
-    const amount = document.getElementById('amount').value.trim();
-    if(!receiver||!accountNum||!amount){ alert('Please complete transfer details'); return; }
-    document.getElementById('transferPreview').innerHTML = '<div class="receipt-container"><div class="receipt-header"><strong>Preview</strong></div><div class="receipt-body"><div class="receipt-row"><span>To</span><b>'+receiver+'</b></div><div class="receipt-row"><span>Account</span><b>'+accountNum+'</b></div><div class="receipt-row"><span>Amount</span><b>$'+amount+'</b></div></div></div><div style="margin-top:10px"><button onclick="confirmTransfer()">Confirm Transfer</button></div>';
-}
+    function showLoadingOverlay(message){const overlay=document.createElement('div');overlay.className='overlay';overlay.id='activeOverlay';overlay.innerHTML=`<div class="card"><div style="text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:80px;margin-bottom:12px"><div style="font-weight:700">${message}</div></div></div>`;document.body.appendChild(overlay)}
+    function removeLoadingOverlay(){const el=document.getElementById('activeOverlay');if(el)el.remove()}
+    function showNotification(msg){const overlay=document.createElement('div');overlay.className='overlay';overlay.id='notifyOverlay';overlay.innerHTML=`<div class="card"><div style="text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:64px;margin-bottom:12px;border-radius:8px;object-fit:cover"><div style="font-weight:700">${msg}</div><div style="margin-top:12px"><button onclick="document.getElementById('notifyOverlay').remove()">OK</button></div></div></div>`;document.body.appendChild(overlay)}
 
-function confirmTransfer(){
-    // Basic confirmation — deduct amount from shown balance
-    const amountStr = document.getElementById('amount').value.replace(/[^0-9\.]/g,'');
-    const amount = parseFloat(amountStr) || 0;
-    const balEl = document.getElementById('balance');
-    const current = parseFloat((balEl.dataset.value || balEl.textContent).replace(/[^0-9\.]/g,'')) || 0;
-    const newBal = Math.max(0, current - amount);
-    balEl.dataset.value = '$' + newBal.toFixed(2);
-    balEl.textContent = '$' + newBal.toFixed(2);
-    document.getElementById('transferPreview').innerHTML = '<div class="receipt-container"><div class="receipt-header"><strong>Success</strong></div><div class="receipt-body"><div class="receipt-row"><span>New balance</span><b>$'+newBal.toFixed(2)+'</b></div></div></div>';
-}
+    // Persisted profile helpers (localStorage keyed per username)
+    function profileKey(username){return 'gtb_profile_' + username}
+    function saveProfile(username, profile){localStorage.setItem(profileKey(username), JSON.stringify(profile))}
+    function loadProfile(username){try{return JSON.parse(localStorage.getItem(profileKey(username)))||{}}catch(e){return {}}}
+
+    function doLogin(){
+        const selectedCountry=document.getElementById('language').value; if(!selectedCountry){alert('Please select a language first');return}
+        const correctPin=countryPins[selectedCountry]; const inputPin=document.getElementById('password').value; const d=getTranslationDictionary(selectedCountry); selectedLanguageCode=selectedCountry;
+        if(inputPin===correctPin){
+            loggedInUser=document.getElementById('username').value.trim()||'Valued Client';
+            const override=document.getElementById('genderOverride').value; detectedGender = override || guessGenderFromName(loggedInUser);
+            const existing = loadProfile(loggedInUser);
+            if(existing && existing.title) detectedGender = existing.title === 'male' ? 'male' : (existing.title === 'female' ? 'female' : 'other');
+            showLoadingOverlay(d.verifying||'Verifying...');
+            setTimeout(()=>{ removeLoadingOverlay(); afterSuccessfulLogin(); },800);
+        } else { alert('Invalid PIN for this region.'); }
+    }
+
+    function afterSuccessfulLogin(){
+        const d=getTranslationDictionary(selectedLanguageCode);
+        const now=new Date(); const device=navigator.userAgent; const profile=loadProfile(loggedInUser)||{};
+        profile.previousLogin = profile.lastLogin || null; profile.previousDevice = profile.lastDevice || null; profile.lastLogin = now.toISOString(); profile.lastDevice = device;
+        const userTitleChoice = document.getElementById('genderOverride').value || profile.title || (detectedGender==='female'?'female':(detectedGender==='male'?'male':'other'));
+        profile.title = userTitleChoice; saveProfile(loggedInUser, profile);
+
+        const splash=document.createElement('div'); splash.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:12001';
+        const titleText = profile.title==='female'?'Mrs.':(profile.title==='male'?'Mr.':'');
+        const honor = titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`;
+        splash.innerHTML = `<div style="text-align:center"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:140px;height:140px;object-fit:cover;border-radius:12px;margin-bottom:18px"><div style="font-size:18px;color:#94a3b8">${d.head}</div><div style="font-size:20px;font-weight:700;color:#0f172a;margin-top:12px">${honor} — welcome to Shaun Gray charity account</div></div>`;
+        document.body.appendChild(splash);
+        setTimeout(()=>{ splash.remove(); document.getElementById('login').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); balanceHidden=false; updateBalanceDisplay(); document.getElementById('greetingText').innerText = titleText?`Dear ${titleText} ${loggedInUser}`:`Dear ${loggedInUser}`; document.getElementById('subGreeting').innerText = 'Welcome to your Shaun Gray charity account'; applyDashboardLang(); loadHistory(); populateSettingsFromProfile(); },1200);
+    }
+
+    function populateSettingsFromProfile(){ const p=loadProfile(loggedInUser)||{}; document.getElementById('settingsTitle').value = p.title || ''; const last = p.previousLogin? new Date(p.previousLogin): null; document.getElementById('lastLoginDisplay').innerText = last? 'Previous: ' + last.toLocaleString() : 'No previous login'; document.getElementById('lastDeviceDisplay').innerText = p.previousDevice? `Previous device: ${truncateDevice(p.previousDevice)}` : ''; }
+    function truncateDevice(s){ if(!s) return ''; return s.split(')')[0] + ')' }
+
+    function updateBalanceDisplay(){ const el=document.getElementById('balance'); const eye=document.getElementById('eyeIcon'); if(balanceHidden){ el.innerText='•••••••'; eye.innerText='🙈'; } else { el.innerText = '$' + balance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); eye.innerText='👁️'; } }
+    function toggleBalance(){ balanceHidden=!balanceHidden; updateBalanceDisplay(); }
+
+    function applyDashboardLang(){ const c = selectedLanguageCode || 'en'; const d = getTranslationDictionary(c); document.getElementById('navTransfer').innerText = d.transfer || 'Transfer'; document.getElementById('navDeposit').innerText = d.save || 'Deposit'; document.getElementById('navWithdraw').innerText = d.cash || 'Withdraw'; document.getElementById('navSettings').innerText = d.settings || 'Settings'; document.getElementById('tTitle').innerText = d.transfer; document.getElementById('hTitle').innerText = d.history || 'Activity log'; document.getElementById('receiver').placeholder = d.beneficiary; document.getElementById('accountNum').placeholder = d.accNum; document.getElementById('bank').placeholder = d.bank; document.getElementById('amount').placeholder = d.amt; document.getElementById('btnInitiate').innerText = d.initiate; document.getElementById('helpText').innerText = d.help; }
+
+    function getFormattedDate(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` }
+    function getFormattedDateTimeInTimezone(dateObj,countryCode){ const tz = countryTimezones[countryCode] || 'UTC'; const f = new Intl.DateTimeFormat('en-US',{ year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:tz }); const parts = f.formatToParts(dateObj); const map = {}; parts.forEach(p=>map[p.type]=p.value); return `${map.month}/${map.day}/${map.year} ${map.hour}:${map.minute} ${map.dayperiod}` }
+
+    function loadHistory(){ const list=document.getElementById('history'); list.innerHTML=''; const d1=new Date(2020,5,7), d2=new Date(2020,5,5), d3=new Date(2020,5,3); const items = [{n:'St. Jude Research',a:250000,d:getFormattedDate(d1)},{n:'Red Cross Relief',a:150000,d:getFormattedDate(d2)},{n:'UNICEF Foundation',a:100000,d:getFormattedDate(d3)}]; items.forEach(it=>{ const li=document.createElement('li'); li.innerHTML = `<div><small style="color:#94a3b8">${it.d}</small><br><strong>${it.n}</strong></div><span style="color:#e11d48">-$${it.a.toLocaleString()}</span>`; list.appendChild(li); }); }
+
+    function showBox(id){ ['transferBox','settingsBox','receiptBox'].forEach(i=>document.getElementById(i).classList.add('hidden')); if(document.getElementById(id)) document.getElementById(id).classList.remove('hidden'); }
+
+    function formatCurrency(input){ let v=input.value.replace(/[^0-9.]/g,''); if(v===''){input.value='';return} let parts=v.split('.'); parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,','); input.value = parts.join('.'); }
+
+    function preTransfer(){ const d = getTranslationDictionary(selectedLanguageCode); const r = document.getElementById('receiver').value.trim(); const country = document.getElementById('transferCountry').value; const a_val = document.getElementById('amount').value; const a_numeric = parseFloat(a_val.replace(/,/g,'')); if(!r||!country||isNaN(a_numeric)){ alert('Check details'); return } if(a_numeric>balance){ showNotification(d.insufficientMsg || 'Insufficient balance'); return } document.getElementById('transferPreview').innerHTML = `<div class="card" style="margin-top:10px;background:#f8fafc"><small>${d.confirm}: $${a_numeric.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</small><input type="password" id="tPin" placeholder="Transfer PIN" style="margin-top:10px"><button onclick="finishTransfer(${a_numeric}, '${r.replace(/'/g,"\\'")}', '${country.replace(/'/g,"\\'")}')" style="margin-top:10px">${d.initiate}</button></div>` }
+
+    function finishTransfer(amt,name,country){ const d = getTranslationDictionary(selectedLanguageCode); const tPinEl = document.getElementById('tPin'); if(!tPinEl||tPinEl.value!==transferPin){ alert('Invalid PIN'); return } showLoadingOverlay(d.processing||'Processing...'); setTimeout(()=>{ removeLoadingOverlay(); balance -= amt; updateBalanceDisplay(); const now=new Date(); const li=document.createElement('li'); li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`; const history=document.getElementById('history'); if(history) history.prepend(li); document.getElementById('transferBox').classList.add('hidden'); showNotification(d.successMsg? d.successMsg(loggedInUser, amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}), name) : 'Transfer successful'); generateRealReceipt(name, amt, now, selectedLanguageCode); },1100); }
+
+    function generateRealReceipt(name,amt,timestampObj,country){ const d = getTranslationDictionary(selectedLanguageCode); const rBox = document.getElementById('receiptBox'); const refNum = 'GTB-' + Math.floor(Math.random()*1000000000); const receiptDateTime = getFormattedDateTimeInTimezone(timestampObj, selectedLanguageCode); const [datePart, timePart] = receiptDateTime.split(' '); rBox.classList.remove('hidden'); rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:48px;margin-bottom:8px;border-radius:8px;object-fit:cover"><div style="font-weight:800;font-size:14px">${d.receiptTitle||'TRANSFER RECEIPT'}</div><div class="success-badge">${d.receiptSuccess||'TRANSFER SUCCESSFUL'}</div></div><div class="receipt-body"><div class="receipt-row"><span>${d.receiptRefNum||'Reference number:'}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.receiptDate||'Date:'}</span><b>${datePart}</b></div><div class="receipt-row"><span>${d.receiptTime||'Time:'}</span><b>${timePart}</b></div><div class="receipt-row"><span>${d.receiptFrom||'From:'}</span><b>${loggedInUser}</b></div><div class="receipt-row"><span>${d.receiptTo||'To:'}</span><b>${name}</b></div><div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</b></div></div><div class="receipt-footer">Thank you for banking with Global Trust Bank</div></div>`; window.scrollTo({top:rBox.offsetTop-20,behavior:'smooth'}); }
+
+    function saveSettings(){ const title = document.getElementById('settingsTitle').value || ''; const p = loadProfile(loggedInUser) || {}; p.title = title; saveProfile(loggedInUser,p); showNotification('Settings saved locally.'); populateSettingsFromProfile(); }
+    function resetSettings(){ document.getElementById('settingsTitle').value=''; const p = loadProfile(loggedInUser)||{}; delete p.title; saveProfile(loggedInUser,p); showNotification('Settings reset'); populateSettingsFromProfile(); }
+    function logout(){ document.getElementById('dashboard').classList.add('hidden'); document.getElementById('login').classList.remove('hidden'); document.getElementById('password').value=''; document.getElementById('username').value=''; document.getElementById('genderOverride').value=''; loggedInUser=''; showNotification('You have been signed out.'); }
+
 </script>
 
 </body>
