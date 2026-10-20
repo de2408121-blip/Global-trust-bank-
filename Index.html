@@ -380,7 +380,7 @@
         const parts = formatter.formatToParts(dateObj);
         const partMap = {};
         parts.forEach(part => { partMap[part.type] = part.value; });
-        return `${partMap.month}/${partMap.day}/${partMap.year} ${partMap.hour}:${partMap.minute} ${partMap.dayperiod}`;
+        return `${partMap.month}/${partMap.day}/${partMap.year} ${partMap.hour}:${partMap.minute}`;
     }
 
     function loadHistory() {
@@ -433,7 +433,7 @@
         const c = selectedLanguageCode;
         const d = getTranslationDictionary(c);
         if(document.getElementById("tPin").value !== transferPin) { alert("Invalid PIN"); return; }
-        showLoadingOverlay(d.processing);
+        showLoadingOverlay("Transfer in progress");
         setTimeout(() => {
             removeLoadingOverlay();
             balance -= amt;
