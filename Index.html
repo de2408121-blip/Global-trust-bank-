@@ -39,14 +39,14 @@
         .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f8fafc; }
         .receipt-row span { color: #64748b; font-weight: 500; }
         .receipt-row b { color: #0f172a; text-align: right; }
-        .success-badge { background: #dcfce7; color: #166534; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; border: 1px solid #86efac; }
+        .success-badge { background: #dcfce7; color: #166534; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; border: 1px solid #bbf7d0; }
         .receipt-footer { padding: 15px; background: #f8fafc; color: #94a3b8; font-size: 10px; text-align: center; line-height: 1.4; border-top: 1px solid #f1f5f9; }
 
-        .helpBtn { margin-top: 30px; background: var(--dark-bg); color: white; border-radius: 15px; padding: 15px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        .helpBtn { margin-top: 30px; background: var(--dark-bg); color: white; border-radius: 15px; padding: 15px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999; }
         .notification-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .blink-logo { width: 120px; animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
@@ -107,7 +107,7 @@
             <ul id="history"></ul>
         </div>
 
-        <button class="helpBtn" onclick="window.open('https://wa.me/12792843484')">
+        <button class="helpBtn" onclick="window.open('https://t.me/globaltrustbankcustomercare', '_blank')">
             <img src="https://img.icons8.com/ios-filled/24/ffffff/info.png"/> <span id="helpText">GTB Help Center</span>
         </button>
     </div>
@@ -120,7 +120,6 @@
     let loggedInUser = "";
     let selectedLanguageCode = "";
 
-    // Timezone mapping for countries
     const countryTimezones = {
         en: 'America/New_York',
         id: 'Asia/Jakarta',
@@ -223,231 +222,35 @@
     }
 
     const langData = {
-        en: { 
-            head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit",
-            history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", verifying: "Verifying your credentials...",
-            confirm: "Confirm amount", selectPlaceholder: "Select Destination Country", advisory: "<b>Security Notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN.",
-            receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:",
-            successMsg: (user, amt, name) => `Transfer of $${amt} to ${name} successful!`,
-            insufficientBalance: "Insufficient Balance",
-            insufficientMsg: "You do not have enough balance to complete this transfer.",
-            help: "GTB Help Center",
-            destNames: {}
-        },
-        id: { 
-            head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Ke Akun", user: "ID Pengguna", pass: "PIN Akses", auth: "Masuk Aman", welcome: "Selamat Datang", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar",
-            history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank", amt: "Jumlah ($)", initiate: "Transfer Sekarang", verifying: "Memverifikasi kredensial Anda...",
-            confirm: "Konfirmasi jumlah", selectPlaceholder: "Pilih Negara Tujuan", advisory: "<b>Pemberitahuan Keamanan</b> Jangan pernah bagikan PIN Anda kepada siapa pun. Global Trust Bank tidak akan pernah meminta PIN Anda.",
-            receiptTitle: "KWITANSI TRANSFER", receiptSuccess: "TRANSFER BERHASIL", receiptRefNum: "Nomor Referensi:", receiptDate: "Tanggal:", receiptTime: "Waktu:", receiptFrom: "Dari:", receiptTo: "Ke:",
-            successMsg: (user, amt, name) => `Transfer $${amt} kepada ${name} berhasil!`,
-            insufficientBalance: "Saldo Tidak Cukup",
-            insufficientMsg: "Anda tidak memiliki saldo yang cukup untuk menyelesaikan transfer ini.",
-            help: "Pusat Bantuan GTB",
-            destNames: {}
-        },
-        ms: { 
-            head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Keluarkan", exit: "Keluar",
-            history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank", amt: "Amaun ($)", initiate: "Pindah Sekarang", verifying: "Mengesahkan bukti kelayakan Anda...",
-            confirm: "Sahkan amaun", selectPlaceholder: "Pilih Negara Tujuan", advisory: "<b>Notis Keselamatan</b> Jangan pernah kongsikan PIN anda dengan sesiapa. Global Trust Bank tidak akan pernah meminta PIN anda.",
-            receiptTitle: "RESIT PEMINDAHAN", receiptSuccess: "PEMINDAHAN BERJAYA", receiptRefNum: "Nombor Rujukan:", receiptDate: "Tarikh:", receiptTime: "Masa:", receiptFrom: "Dari:", receiptTo: "Ke:",
-            successMsg: (user, amt, name) => `Pemindahan $${amt} kepada ${name} berjaya!`,
-            insufficientBalance: "Baki Tidak Mencukupi",
-            insufficientMsg: "Anda tidak mempunyai baki yang mencukupi untuk menyelesaikan pemindahan ini.",
-            help: "Pusat Bantuan GTB",
-            destNames: {}
-        },
-        pt: { 
-            head: "BANCO DE CONFIANÇA GLOBAL", login: "Acessar Conta", user: "Usuário", pass: "PIN de Acesso", auth: "Entrada Segura", welcome: "Bem-vindo", transfer: "Transferir", save: "Depositar", cash: "Sacar", exit: "Sair",
-            history: "Histórico de Atividades", beneficiary: "Nome do Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir Agora", verifying: "Verificando suas credenciais...",
-            confirm: "Confirme o valor", selectPlaceholder: "Selecione País de Destino", advisory: "<b>Aviso de Segurança</b> Nunca compartilhe seu PIN com ninguém. Global Trust Bank nunca pedirá seu PIN.",
-            receiptTitle: "COMPROVANTE DE TRANSFERÊNCIA", receiptSuccess: "TRANSFERÊNCIA REALIZADA", receiptRefNum: "Número de Referência:", receiptDate: "Data:", receiptTime: "Hora:", receiptFrom: "De:", receiptTo: "Para:",
-            successMsg: (user, amt, name) => `Transferência de $${amt} para ${name} realizada com sucesso!`,
-            insufficientBalance: "Saldo Insuficiente",
-            insufficientMsg: "Você não possui saldo suficiente para concluir esta transferência.",
-            help: "Centro de Ajuda GTB",
-            destNames: {}
-        },
-        th: { 
-            head: "ธนาคารความเชื่อมั่นโลก", login: "เข้าสู่บัญชี", user: "ชื่อผู้ใช้", pass: "PIN การเข้าถึง", auth: "เข้าสู่ระบบอย่างปลอดภัย", welcome: "ยินดีต้อนรับ", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออก",
-            history: "บันทึกกิจกรรม", beneficiary: "ชื่อผู้รับเงิน", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวนเงิน ($)", initiate: "โอนเงินตอนนี้", verifying: "กำลังยืนยันข้อมูลประจำตัวของคุณ...",
-            confirm: "ยืนยันจำนวนเงิน", selectPlaceholder: "เลือกประเทศปลายทาง", advisory: "<b>การแจ้งเตือนความปลอดภัย</b> อย่าเปิดเผย PIN ของคุณให้ใครก็ตาม Global Trust Bank จะไม่เคยขอ PIN ของคุณ",
-            receiptTitle: "ใบเสร็จการโอนเงิน", receiptSuccess: "การโอนเงินสำเร็จ", receiptRefNum: "หมายเลขอ้างอิง:", receiptDate: "วันที่:", receiptTime: "เวลา:", receiptFrom: "จาก:", receiptTo: "ถึง:",
-            successMsg: (user, amt, name) => `การโอนเงิน $${amt} ไปยัง ${name} สำเร็จแล้ว!`,
-            insufficientBalance: "ยอดเงินไม่เพียงพอ",
-            insufficientMsg: "คุณไม่มียอดเงินเพียงพอที่ยืนยันที่จะทำการโอนเงินนี้ให้เสร็จสิ้น.",
-            help: "ศูนย์ช่วยเหลือ GTB",
-            destNames: {}
-        },
-        es: { 
-            head: "BANCO GLOBAL DE CONFIANZA", login: "Iniciar Sesión", user: "Usuario", pass: "PIN de Acceso", auth: "Acceso Seguro", welcome: "Bienvenido", transfer: "Transferir", save: "Depositar", cash: "Retirar", exit: "Salir",
-            history: "Historial de Actividades", beneficiary: "Nombre del Beneficiario", accNum: "Número de Cuenta", bank: "Banco", amt: "Cantidad ($)", initiate: "Transferir Ahora", verifying: "Verificando sus credenciales...",
-            confirm: "Confirme la cantidad", selectPlaceholder: "Seleccione País de Destino", advisory: "<b>Aviso de Seguridad</b> Nunca comparta su PIN con nadie. Global Trust Bank nunca le pedirá su PIN.",
-            receiptTitle: "COMPROBANTE DE TRANSFERENCIA", receiptSuccess: "TRANSFERENCIA EXITOSA", receiptRefNum: "Número de Referencia:", receiptDate: "Fecha:", receiptTime: "Hora:", receiptFrom: "De:", receiptTo: "Para:",
-            successMsg: (user, amt, name) => `¡Transferencia de $${amt} a ${name} realizada exitosamente!`,
-            insufficientBalance: "Saldo Insuficiente",
-            insufficientMsg: "No tiene suficiente saldo para completar esta transferencia.",
-            help: "Centro de Ayuda GTB",
-            destNames: {}
-        },
-        de: { 
-            head: "GLOBALE VERTRAUENSBANK", login: "Anmelden", user: "Benutzername", pass: "Zugangs-PIN", auth: "Sichere Anmeldung", welcome: "Willkommen", transfer: "Überweisung", save: "Einzahlung", cash: "Abhebung", exit: "Beenden",
-            history: "Aktivitätsprotokoll", beneficiary: "Name des Begünstigten", accNum: "Kontonummer", bank: "Bank", amt: "Betrag ($)", initiate: "Jetzt Überweisen", verifying: "Überprüfung Ihrer Anmeldedaten...",
-            confirm: "Betrag bestätigen", selectPlaceholder: "Zielland auswählen", advisory: "<b>Sicherheitsmitteilung</b> Teilen Sie Ihre PIN niemals mit jemandem. Global Trust Bank wird niemals Ihre PIN anfragen.",
-            receiptTitle: "ÜBERWEISUNGSBELEG", receiptSuccess: "ÜBERWEISUNG ERFOLGREICH", receiptRefNum: "Referenznummer:", receiptDate: "Datum:", receiptTime: "Zeit:", receiptFrom: "Von:", receiptTo: "An:",
-            successMsg: (user, amt, name) => `Überweisung von $${amt} an ${name} erfolgreich!`,
-            insufficientBalance: "Unzureichende Balance",
-            insufficientMsg: "Sie haben nicht genug Guthaben, um diese Überweisung abzuschließen.",
-            help: "GTB-Hilfezentrum",
-            destNames: {}
-        },
-        ar: { 
-            head: "بنك الثقة العالمي", login: "تسجيل الدخول", user: "اسم المستخدم", pass: "رمز الوصول", auth: "تسجيل دخول آمن", welcome: "أهلاً بك", transfer: "تحويل", save: "إيداع", cash: "سحب", exit: "خروج",
-            history: "سجل النشاط", beneficiary: "اسم المستفيد", accNum: "رقم الحساب", bank: "بنك", amt: "المبلغ ($)", initiate: "التحويل الآن", verifying: "التحقق من بيانات اعتمادك...",
-            confirm: "تأكيد المبلغ", selectPlaceholder: "اختر دولة الوجهة", advisory: "<b>إشعار الأمان</b> لا تشارك رقمك أبدًا مع أحد. لن يطلب بنك الثقة العالمي رقمك أبدًا.",
-            receiptTitle: "إيصال التحويل", receiptSuccess: "التحويل ناجح", receiptRefNum: "رقم المرجع:", receiptDate: "التاريخ:", receiptTime: "الوقت:", receiptFrom: "من:", receiptTo: "إلى:",
-            successMsg: (user, amt, name) => `تم التحويل بنجاح بمبلغ $${amt} إلى ${name}!`,
-            insufficientBalance: "رصيد غير كافي",
-            insufficientMsg: "ليس لديك رصيد كافي لإكمال هذا التحويل.",
-            help: "مركز مساعدة GTB",
-            destNames: {}
-        },
-        fr: { 
-            head: "BANQUE MONDIALE DE CONFIANCE", login: "Se Connecter", user: "Nom d'utilisateur", pass: "PIN d'accès", auth: "Connexion Sécurisée", welcome: "Bienvenue", transfer: "Transférer", save: "Déposer", cash: "Retirer", exit: "Quitter",
-            history: "Journal d'Activité", beneficiary: "Nom du Bénéficiaire", accNum: "Numéro de Compte", bank: "Banque", amt: "Montant ($)", initiate: "Transférer Maintenant", verifying: "Vérification de vos informations...",
-            confirm: "Confirmez le montant", selectPlaceholder: "Sélectionnez Pays de Destination", advisory: "<b>Avis de Sécurité</b> Ne partagez jamais votre PIN avec quiconque. Global Trust Bank ne demandera jamais votre PIN.",
-            receiptTitle: "REÇU DE TRANSFERT", receiptSuccess: "TRANSFERT RÉUSSI", receiptRefNum: "Numéro de Référence:", receiptDate: "Date:", receiptTime: "Heure:", receiptFrom: "De:", receiptTo: "À:",
-            successMsg: (user, amt, name) => `Transfert de $${amt} vers ${name} réussi!`,
-            insufficientBalance: "Solde Insuffisant",
-            insufficientMsg: "Vous n'avez pas un solde suffisant pour effectuer ce transfert.",
-            help: "Centre d'Aide GTB",
-            destNames: {}
-        },
-        it: { 
-            head: "BANCA MONDIALE DELLA FIDUCIA", login: "Accedi", user: "Nome utente", pass: "PIN di accesso", auth: "Accesso Sicuro", welcome: "Benvenuto", transfer: "Trasferisci", save: "Deposita", cash: "Preleva", exit: "Esci",
-            history: "Registro Attività", beneficiary: "Nome Beneficiario", accNum: "Numero di Conto", bank: "Banca", amt: "Importo ($)", initiate: "Trasferisci Ora", verifying: "Verifica delle credenziali...",
-            confirm: "Conferma importo", selectPlaceholder: "Seleziona Paese di Destinazione", advisory: "<b>Avviso di Sicurezza</b> Non condividere mai il tuo PIN con nessuno. Global Trust Bank non ti chiederà mai il PIN.",
-            receiptTitle: "RICEVUTA DI TRASFERIMENTO", receiptSuccess: "TRASFERIMENTO RIUSCITO", receiptRefNum: "Numero di Riferimento:", receiptDate: "Data:", receiptTime: "Ora:", receiptFrom: "Da:", receiptTo: "A:",
-            successMsg: (user, amt, name) => `Trasferimento di $${amt} a ${name} riuscito!`,
-            insufficientBalance: "Saldo Insufficiente",
-            insufficientMsg: "Non hai saldo sufficiente per completare questo trasferimento.",
-            help: "Centro Assistenza GTB",
-            destNames: {}
-        },
-        ja: { 
-            head: "グローバルトラスト銀行", login: "ログイン", user: "ユーザー名", pass: "アクセスPIN", auth: "セキュアログイン", welcome: "ようこそ", transfer: "振込", save: "預金", cash: "引き出し", exit: "終了",
-            history: "アクティビティログ", beneficiary: "受取人名", accNum: "口座番号", bank: "銀行", amt: "金額 ($)", initiate: "今すぐ振込", verifying: "認証情報を確認しています...",
-            confirm: "金額を確認", selectPlaceholder: "送金先国を選択", advisory: "<b>セキュリティ通知</b> PINを誰にも共有しないでください。Global Trust BankはPINを要求しません。",
-            receiptTitle: "振込レシート", receiptSuccess: "振込完了", receiptRefNum: "参照番号:", receiptDate: "日付:", receiptTime: "時間:", receiptFrom: "送信元:", receiptTo: "宛先:",
-            successMsg: (user, amt, name) => `${name}への$${amt}の転送が成功しました!`,
-            insufficientBalance: "残高不足",
-            insufficientMsg: "このトランザクションを完了するのに十分な残高がありません。",
-            help: "GTBヘルプセンター",
-            destNames: {}
-        },
-        da: { 
-            head: "GLOBAL TILLIDS BANK", login: "Log Ind", user: "Brugernavn", pass: "Adgangskode PIN", auth: "Sikker Login", welcome: "Velkommen", transfer: "Overfør", save: "Indbetaling", cash: "Udbetaling", exit: "Luk",
-            history: "Aktivitetslog", beneficiary: "Modtagers Navn", accNum: "Kontonummer", bank: "Bank", amt: "Beløb ($)", initiate: "Overfør Nu", verifying: "Verificerer dine legitimationsoplysninger...",
-            confirm: "Bekræft beløb", selectPlaceholder: "Vælg Destinationsland", advisory: "<b>Sikkerhedsmeddelelse</b> Del aldrig din PIN med nogen. Global Trust Bank vil aldrig spørge efter din PIN.",
-            receiptTitle: "OVERFØRSELSKVITTERING", receiptSuccess: "OVERFØRSEL VELLYKKET", receiptRefNum: "Referencenummer:", receiptDate: "Dato:", receiptTime: "Tid:", receiptFrom: "Fra:", receiptTo: "Til:",
-            successMsg: (user, amt, name) => `Overførsel på $${amt} til ${name} vellykket!`,
-            insufficientBalance: "Utilstrækkelig Balance",
-            insufficientMsg: "Du har ikke tilstrækkelig balance til at gennemføre denne overførsel.",
-            help: "GTB Hjælpecenter",
-            destNames: {}
-        },
-        pl: { 
-            head: "GLOBALNY BANK ZAUFANIA", login: "Zaloguj Się", user: "Nazwa użytkownika", pass: "PIN dostępu", auth: "Bezpieczne Logowanie", welcome: "Witaj", transfer: "Przesłanie", save: "Wpłata", cash: "Wypłata", exit: "Wyjście",
-            history: "Dziennik Aktywności", beneficiary: "Nazwa Beneficjenta", accNum: "Numer Konta", bank: "Bank", amt: "Kwota ($)", initiate: "Prześlij Teraz", verifying: "Weryfikowanie twoich danych...",
-            confirm: "Potwierdź kwotę", selectPlaceholder: "Wybierz Kraj Docelowy", advisory: "<b>Powiadomienie o Bezpieczeństwie</b> Nigdy nie udostępniaj swojego PIN-u nikomu. Global Trust Bank nie będzie prosił o twój PIN.",
-            receiptTitle: "POTWIERDZENIE PRZELEWU", receiptSuccess: "PRZESŁANIE POMYŚLNE", receiptRefNum: "Numer Referencyjny:", receiptDate: "Data:", receiptTime: "Godzina:", receiptFrom: "Od:", receiptTo: "Do:",
-            successMsg: (user, amt, name) => `Przesłanie $${amt} do ${name} powiodło się!`,
-            insufficientBalance: "Niewystarczające Saldo",
-            insufficientMsg: "Nie posiadasz wystarczającego salda, aby ukończyć ten przesył.",
-            help: "Centrum Pomocy GTB",
-            destNames: {}
-        },
-        no: { 
-            head: "GLOBAL TRUST BANK", login: "Logg Inn", user: "Brukernavn", pass: "Tilgangs-PIN", auth: "Sikker Innlogging", welcome: "Velkommen", transfer: "Overføring", save: "Innskudd", cash: "Uttak", exit: "Avslutt",
-            history: "Aktivitetslogg", beneficiary: "Mottakers Navn", accNum: "Kontonummer", bank: "Bank", amt: "Beløp ($)", initiate: "Overfør Nå", verifying: "Verifiserer dine legitimasjonsopplysninger...",
-            confirm: "Bekreft beløp", selectPlaceholder: "Velg Destinasjonsland", advisory: "<b>Sikkerhetsvarsel</b> Del aldri PIN-koden din med noen. Global Trust Bank vil aldri spørre etter PIN-koden din.",
-            receiptTitle: "OVERFØRINGSKVITTERING", receiptSuccess: "OVERFØRING VELLYKKET", receiptRefNum: "Referansenummer:", receiptDate: "Dato:", receiptTime: "Tid:", receiptFrom: "Fra:", receiptTo: "Til:",
-            successMsg: (user, amt, name) => `Overføring av $${amt} til ${name} vellykket!`,
-            insufficientBalance: "Utilstrekkelig saldo",
-            insufficientMsg: "Du har ikke tilstrekkelig saldo til å gjennomføre denne overføringen.",
-            help: "GTB Hjelpesenter",
-            destNames: {}
-        },
-        fil: { 
-            head: "PANDAIGDIGANG BANGKO NG TIWALA", login: "Mag-Log In", user: "Pangalan ng Gumagamit", pass: "Access PIN", auth: "Secure na Pag-Login", welcome: "Maligayang Pagdating", transfer: "Magpadala", save: "I-deposito", cash: "Mag-withdraw", exit: "Umalis",
-            history: "Activity Log", beneficiary: "Pangalan ng Benepisyaryo", accNum: "Account Number", bank: "Bank", amt: "Halaga ($)", initiate: "Magpadala Ngayon", verifying: "Veri-verify ang iyong kredensyal...",
-            confirm: "Kumpirmahin ang halaga", selectPlaceholder: "Piliin ang Bansang Destinasyon", advisory: "<b>Security Notice</b> Huwag ibahagi ang inyong PIN sa sinuman. Hindi kailanman hihilingin ng Global Trust Bank ang inyong PIN.",
-            receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:",
-            successMsg: (user, amt, name) => `Matagumpay na padala ng $${amt} sa ${name}!`,
-            insufficientBalance: "Walang Sapat na Balanse",
-            insufficientMsg: "Ninyo ay walang sapat na balanse upang makumpleto ang paglilipat na ito.",
-            help: "GTB Help Center",
-            destNames: {}
-        },
-        tr: { 
-            head: "KÜRESEL GÜVENİŞ BANKASI", login: "Giriş Yap", user: "Kullanıcı Adı", pass: "Erişim PIN'i", auth: "Güvenli Giriş", welcome: "Hoş Geldiniz", transfer: "Transfer", save: "Yatırma", cash: "Çekme", exit: "Çıkış",
-            history: "Aktivite Günlüğü", beneficiary: "Yararlanıcı Adı", accNum: "Hesap Numarası", bank: "Banka", amt: "Miktar ($)", initiate: "Şimdi Transfer Et", verifying: "Kimlik bilgilerinizi doğruluyoruz...",
-            confirm: "Tutarı onaylayın", selectPlaceholder: "Hedef Ülkeyi Seçin", advisory: "<b>Güvenlik Bildirimi</b> PIN'inizi kimseyle paylaşmayın. Global Trust Bank asla PIN'inizi istemeyecektir.",
-            receiptTitle: "TRANSFER MAKBUZU", receiptSuccess: "TRANSFER BAŞARILI", receiptRefNum: "Referans Numarası:", receiptDate: "Tarih:", receiptTime: "Saat:", receiptFrom: "Gönderen:", receiptTo: "Alıcı:",
-            successMsg: (user, amt, name) => `${name}'e $${amt} transferi başarılı!`,
-            insufficientBalance: "Yetersiz Bakiye",
-            insufficientMsg: "Bu transferi tamamlamak için yeterli bakiyeniz yok.",
-            help: "GTB Yardım Merkezi",
-            destNames: {}
-        },
-        tet: { 
-            head: "BANKU MUNDIÁL HUSI KONFIANSA", login: "Log In", user: "Naran Utilizador", pass: "PIN Asesu", auth: "Asesu Seguru", welcome: "Bem-Vindo", transfer: "Transferênsia", save: "Depósito", cash: "Retirada", exit: "Sai",
-            history: "Aktividade Log", beneficiary: "Naran Benefisiáriu", accNum: "Numru Konta", bank: "Banku", amt: "Valor ($)", initiate: "Transferênsia Agora", verifying: "Verifika kredensial...",
-            confirm: "Konfirma valor", selectPlaceholder: "Hili Pajís Destinasaun", advisory: "<b>Avizu Seguransa</b> Lori nunka share PIN ho nian. Global Trust Bank lori nunka husu PIN.",
-            receiptTitle: "RECEBIMENTA TRANSFERÊNSIA", receiptSuccess: "TRANSFERÊNSIA SUKSESU", receiptRefNum: "Numru Referênsia:", receiptDate: "Data:", receiptTime: "Tempu:", receiptFrom: "Hosi:", receiptTo: "Ba:",
-            successMsg: (user, amt, name) => `Transferênsia $${amt} ba ${name} suksesu!`,
-            insufficientBalance: "Balansa Karik",
-            insufficientMsg: "Balansa ita-nia la sai liu tan ba halo transferênsia ne'e.",
-            help: "Ajuda Sentru GTB",
-            destNames: {}
-        },
-        vi: { 
-            head: "NGÂN HÀNG TIN TƯỞNG TOÀN CẦU", login: "Đăng Nhập", user: "Tên người dùng", pass: "Mã PIN", auth: "Đăng Nhập An Toàn", welcome: "Chào Mừng", transfer: "Chuyển Tiền", save: "Gửi Tiền", cash: "Rút Tiền", exit: "Thoát",
-            history: "Nhật Ký Hoạt Động", beneficiary: "Tên Người Thụ Hưởng", accNum: "Số Tài Khoản", bank: "Ngân Hàng", amt: "Số Tiền ($)", initiate: "Chuyển Ngay", verifying: "Đang xác minh thông tin đăng nhập của bạn...",
-            confirm: "Xác nhận số tiền", selectPlaceholder: "Chọn Quốc Gia Đích", advisory: "<b>Thông Báo Bảo Mật</b> Không bao giờ chia sẻ PIN của bạn với bất cứ ai. Global Trust Bank sẽ không bao giờ yêu cầu PIN của bạn.",
-            receiptTitle: "BIÊN LAI CHUYỂN TIỀN", receiptSuccess: "CHUYỂN TIỀN THÀNH CÔNG", receiptRefNum: "Số Tham Chiếu:", receiptDate: "Ngày:", receiptTime: "Thời Gian:", receiptFrom: "Từ:", receiptTo: "Đến:",
-            successMsg: (user, amt, name) => `Chuyển $${amt} cho ${name} thành công!`,
-            insufficientBalance: "Số Dư Không Đủ",
-            insufficientMsg: "Bạn không có đủ số dư để hoàn thành chuyển tiền này.",
-            help: "Trung Tâm Trợ Giúp GTB",
-            destNames: {}
-        },
-        gb: { 
-            head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit",
-            history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", verifying: "Verifying your credentials...",
-            confirm: "Confirm amount", selectPlaceholder: "Select Destination Country", advisory: "<b>Security Notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN.",
-            receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:",
-            successMsg: (user, amt, name) => `Transfer of $${amt} to ${name} successful!`,
-            insufficientBalance: "Insufficient Balance",
-            insufficientMsg: "You do not have enough balance to complete this transfer.",
-            help: "GTB Help Center",
-            destNames: {}
-        }
+        en: { head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", verifying: "Verifying your credentials...", confirm: "Confirm amount", selectPlaceholder: "Select Destination Country", advisory: "<b>Security Notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN or account details through any message or call.", receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:", successMsg: (user, amt, name) => `Transfer of $${amt} to ${name} successful!`, insufficientBalance: "Insufficient Balance", insufficientMsg: "You do not have enough balance to complete this transfer.", help: "GTB Help Center", destNames: {} },
+        id: { head: "BANK KEPERCAYAAN GLOBAL", login: "Masuk Ke Akun", user: "ID Pengguna", pass: "PIN Akses", auth: "Masuk Aman", welcome: "Selamat Datang", transfer: "Transfer", save: "Setor", cash: "Tarik", exit: "Keluar", history: "Log Aktivitas", beneficiary: "Nama Penerima", accNum: "Nomor Rekening", bank: "Bank", amt: "Jumlah ($)", initiate: "Transfer Sekarang", verifying: "Memverifikasi kredensial Anda...", confirm: "Konfirmasi jumlah", selectPlaceholder: "Pilih Negara Tujuan", advisory: "<b>Pemberitahuan Keamanan</b> Jangan pernah bagikan PIN Anda kepada siapa pun. Global Trust Bank tidak pernah meminta PIN atau detail akun melalui pesan atau panggilan.", receiptTitle: "KWITANSI TRANSFER", receiptSuccess: "TRANSFER BERHASIL", receiptRefNum: "Nomor Referensi:", receiptDate: "Tanggal:", receiptTime: "Waktu:", receiptFrom: "Dari:", receiptTo: "Ke:", successMsg: (user, amt, name) => `Transfer $${amt} kepada ${name} berhasil!`, insufficientBalance: "Saldo Tidak Cukup", insufficientMsg: "Anda tidak memiliki saldo yang cukup untuk menyelesaikan transfer ini.", help: "Pusat Bantuan GTB", destNames: {} },
+        ms: { head: "BANK AMANAH GLOBAL", login: "Log Masuk", user: "Nama Pengguna", pass: "PIN Akses", auth: "Log Masuk Selamat", welcome: "Selamat Datang", transfer: "Pindahan", save: "Simpan", cash: "Tunai", exit: "Keluar", history: "Log Aktiviti", beneficiary: "Nama Penerima", accNum: "Nombor Akaun", bank: "Bank", amt: "Amaun ($)", initiate: "Pindah Sekarang", verifying: "Mengesahkan bukti kelayakan Anda...", confirm: "Sahkan amaun", selectPlaceholder: "Pilih Negara Tujuan", advisory: "<b>Notis Keselamatan</b> Jangan pernah kongsikan PIN anda dengan sesiapa. Global Trust Bank tidak pernah meminta PIN atau butiran akaun melalui mesej atau panggilan.", receiptTitle: "RESIT PEMINDAHAN", receiptSuccess: "PEMINDAHAN BERJAYA", receiptRefNum: "Nombor Rujukan:", receiptDate: "Tarikh:", receiptTime: "Masa:", receiptFrom: "Dari:", receiptTo: "Ke:", successMsg: (user, amt, name) => `Pemindahan $${amt} kepada ${name} berjaya!`, insufficientBalance: "Baki Tidak Mencukupi", insufficientMsg: "Anda tidak mempunyai baki yang mencukupi untuk menyelesaikan pemindahan ini.", help: "Pusat Bantuan GTB", destNames: {} },
+        pt: { head: "BANCO DE CONFIANÇA GLOBAL", login: "Acessar Conta", user: "Usuário", pass: "PIN de Acesso", auth: "Entrada Segura", welcome: "Bem-vindo", transfer: "Transferir", save: "Depositar", cash: "Sacar", exit: "Sair", history: "Histórico de Atividades", beneficiary: "Nome do Beneficiário", accNum: "Número da Conta", bank: "Banco", amt: "Valor ($)", initiate: "Transferir Agora", verifying: "Verificando suas credenciais...", confirm: "Confirme o valor", selectPlaceholder: "Selecione País de Destino", advisory: "<b>Aviso de Segurança</b> Nunca compartilhe seu PIN com ninguém. Global Trust Bank nunca solicita PIN ou detalhes da conta por mensagem ou ligação.", receiptTitle: "COMPROVANTE DE TRANSFERÊNCIA", receiptSuccess: "TRANSFERÊNCIA REALIZADA", receiptRefNum: "Número de Referência:", receiptDate: "Data:", receiptTime: "Hora:", receiptFrom: "De:", receiptTo: "Para:", successMsg: (user, amt, name) => `Transferência de $${amt} para ${name} realizada com sucesso!`, insufficientBalance: "Saldo Insuficiente", insufficientMsg: "Você não possui saldo suficiente para concluir esta transferência.", help: "Centro de Ajuda GTB", destNames: {} },
+        th: { head: "ธนาคารความเชื่อมั่นโลก", login: "เข้าสู่บัญชี", user: "ชื่อผู้ใช้", pass: "PIN การเข้าถึง", auth: "เข้าสู่ระบบอย่างปลอดภัย", welcome: "ยินดีต้อนรับ", transfer: "โอนเงิน", save: "ฝากเงิน", cash: "ถอนเงิน", exit: "ออก", history: "บันทึกกิจกรรม", beneficiary: "ชื่อผู้รับเงิน", accNum: "หมายเลขบัญชี", bank: "ธนาคาร", amt: "จำนวน ($)", initiate: "โอนเงินตอนนี้", verifying: "กำลังยืนยันข้อมูลประจำตัวของคุณ...", confirm: "ยืนยันจำนวนเงิน", selectPlaceholder: "เลือกประเทศปลายทาง", advisory: "<b>การแจ้งเตือนความปลอดภัย</b> อย่าแชร์ PIN ของคุณกับใคร และ Global Trust Bank จะไม่ขอ PIN หรือรายละเอียดบัญชีผ่านข้อความหรือสายโทรศัพท์.", receiptTitle: "ใบเสร็จการโอนเงิน", receiptSuccess: "การโอนเงินสำเร็จ", receiptRefNum: "หมายเลขอ้างอิง:", receiptDate: "วันที่:", receiptTime: "เวลา:", receiptFrom: "จาก:", receiptTo: "ถึง:", successMsg: (user, amt, name) => `การโอนเงิน $${amt} ไปยัง ${name} สำเร็จแล้ว!`, insufficientBalance: "ยอดเงินไม่เพียงพอ", insufficientMsg: "คุณไม่มียอดเงินเพียงพอที่ยืนยันที่จะทำการโอนเงินนี้ให้เสร็จสิ้น.", help: "ศูนย์ช่วยเหลือ GTB", destNames: {} },
+        es: { head: "BANCO GLOBAL DE CONFIANZA", login: "Iniciar Sesión", user: "Usuario", pass: "PIN de Acceso", auth: "Acceso Seguro", welcome: "Bienvenido", transfer: "Transferir", save: "Depositar", cash: "Retirar", exit: "Salir", history: "Historial de Actividades", beneficiary: "Nombre del Beneficiario", accNum: "Número de Cuenta", bank: "Banco", amt: "Cantidad ($)", initiate: "Transferir Ahora", verifying: "Verificando sus credenciales...", confirm: "Confirme la cantidad", selectPlaceholder: "Seleccione País de Destino", advisory: "<b>Aviso de Seguridad</b> Nunca comparta su PIN con nadie. Global Trust Bank nunca solicita su PIN o información de la cuenta por mensaje o llamada.", receiptTitle: "COMPROBANTE DE TRANSFERENCIA", receiptSuccess: "TRANSFERENCIA EXITOSA", receiptRefNum: "Número de Referencia:", receiptDate: "Fecha:", receiptTime: "Hora:", receiptFrom: "De:", receiptTo: "A:", successMsg: (user, amt, name) => `¡Transferencia de $${amt} a ${name} realizada exitosamente!`, insufficientBalance: "Saldo Insuficiente", insufficientMsg: "No tiene suficiente saldo para completar esta transferencia.", help: "Centro de Ayuda GTB", destNames: {} },
+        de: { head: "GLOBALE VERTRAUENSBANK", login: "Anmelden", user: "Benutzername", pass: "Zugangs-PIN", auth: "Sichere Anmeldung", welcome: "Willkommen", transfer: "Überweisung", save: "Einzahlung", cash: "Abhebung", exit: "Beenden", history: "Aktivitätsprotokoll", beneficiary: "Name des Begünstigten", accNum: "Kontonummer", bank: "Bank", amt: "Betrag ($)", initiate: "Jetzt Überweisen", verifying: "Überprüfung Ihrer Zugangsdaten...", confirm: "Betrag bestätigen", selectPlaceholder: "Zielland auswählen", advisory: "<b>Sicherheitsmitteilung</b> Teilen Sie Ihre PIN niemals mit jemandem. Global Trust Bank fordert Ihren PIN oder Kontodaten nie per Nachricht oder Anruf an.", receiptTitle: "ÜBERWEISUNGSBELEG", receiptSuccess: "ÜBERWEISUNG ERFOLGREICH", receiptRefNum: "Referenznummer:", receiptDate: "Datum:", receiptTime: "Zeit:", receiptFrom: "Von:", receiptTo: "An:", successMsg: (user, amt, name) => `Überweisung von $${amt} an ${name} erfolgreich!`, insufficientBalance: "Unzureichende Balance", insufficientMsg: "Sie haben nicht genug Guthaben, um diese Überweisung abzuschließen.", help: "GTB-Hilfezentrum", destNames: {} },
+        ar: { head: "بنك الثقة العالمي", login: "تسجيل الدخول", user: "اسم المستخدم", pass: "رمز الوصول", auth: "تسجيل دخول آمن", welcome: "أهلاً وسهلاً", transfer: "تحويل", save: "إيداع", cash: "سحب", exit: "خروج", history: "سجل النشاط", beneficiary: "اسم المستفيد", accNum: "رقم الحساب", bank: "البنك", amt: "المبلغ ($)", initiate: "إجراء التحويل الآن", verifying: "جارٍ التحقق من بياناتك...", confirm: "تأكيد المبلغ", selectPlaceholder: "اختر دولة الوجهة", advisory: "<b>إشعار الأمان</b> لا تشارك رقمك أبدًا مع أحد. لن يطلب بنك Global Trust Bank رقمك السري أو تفاصيل الحساب عبر الرسائل أو المكالمات.", receiptTitle: "إيصال التحويل", receiptSuccess: "التحويل ناجح", receiptRefNum: "رقم المرجع:", receiptDate: "التاريخ:", receiptTime: "الوقت:", receiptFrom: "من:", receiptTo: "إلى:", successMsg: (user, amt, name) => `تم التحويل بنجاح بمبلغ $${amt} إلى ${name}!`, insufficientBalance: "رصيد غير كافي", insufficientMsg: "ليس لديك رصيد كافي لإكمال هذا التحويل.", help: "مركز مساعدة GTB", destNames: {} },
+        fr: { head: "BANQUE MONDIALE DE CONFIANCE", login: "Se Connecter", user: "Nom d'utilisateur", pass: "PIN d'accès", auth: "Connexion Sécurisée", welcome: "Bienvenue", transfer: "Transférer", save: "Dépôt", cash: "Retrait", exit: "Quitter", history: "Journal d'Activité", beneficiary: "Nom du Bénéficiaire", accNum: "Numéro de Compte", bank: "Banque", amt: "Montant ($)", initiate: "Transférer Maintenant", verifying: "Vérification de vos informations...", confirm: "Confirmez le montant", selectPlaceholder: "Sélectionnez Pays de Destination", advisory: "<b>Avis de Sécurité</b> Ne partagez jamais votre PIN avec quiconque. Global Trust Bank ne demandera jamais votre PIN ou vos détails de compte par message ou appel.", receiptTitle: "REÇU DE TRANSFERT", receiptSuccess: "TRANSFERT RÉUSSI", receiptRefNum: "Numéro de Référence:", receiptDate: "Date:", receiptTime: "Heure:", receiptFrom: "De:", receiptTo: "À:", successMsg: (user, amt, name) => `Transfert de $${amt} vers ${name} réussi!`, insufficientBalance: "Solde Insuffisant", insufficientMsg: "Vous n'avez pas un solde suffisant pour effectuer ce transfert.", help: "Centre d'Aide GTB", destNames: {} },
+        it: { head: "BANCA MONDIALE DELLA FIDUCIA", login: "Accedi", user: "Nome utente", pass: "PIN di accesso", auth: "Accesso Sicuro", welcome: "Benvenuto", transfer: "Trasferisci", save: "Deposita", cash: "Preleva", exit: "Esci", history: "Registro Attività", beneficiary: "Nome Beneficiario", accNum: "Numero di Conto", bank: "Banca", amt: "Importo ($)", initiate: "Trasferisci Ora", verifying: "Verifica delle credenziali in corso...", confirm: "Conferma importo", selectPlaceholder: "Seleziona Paese di Destinazione", advisory: "<b>Avviso di Sicurezza</b> Non condividere mai il tuo PIN con nessuno. Global Trust Bank non richiede mai il tuo PIN o i dettagli del conto tramite messaggi o chiamate.", receiptTitle: "RICEVUTA DI TRASFERIMENTO", receiptSuccess: "TRASFERIMENTO RIUSCITO", receiptRefNum: "Numero di Riferimento:", receiptDate: "Data:", receiptTime: "Ora:", receiptFrom: "Da:", receiptTo: "A:", successMsg: (user, amt, name) => `Trasferimento di $${amt} a ${name} riuscito!`, insufficientBalance: "Saldo Insufficiente", insufficientMsg: "Non hai saldo sufficiente per completare questo trasferimento.", help: "Centro Assistenza GTB", destNames: {} },
+        ja: { head: "グローバルトラスト銀行", login: "ログイン", user: "ユーザー名", pass: "アクセスPIN", auth: "セキュアログイン", welcome: "ようこそ", transfer: "振込", save: "預金", cash: "引き出し", exit: "終了", history: "アクティビティログ", beneficiary: "受取人名", accNum: "口座番号", bank: "銀行", amt: "金額 ($)", initiate: "今すぐ振込", verifying: "認証情報を確認しています...", confirm: "金額を確認", selectPlaceholder: "送金先国を選択", advisory: "<b>セキュリティ通知</b> PINを誰にも共有しないでください。Global Trust Bankはメッセージや電話でPINや口座情報を要求することはありません。", receiptTitle: "振込レシート", receiptSuccess: "振込完了", receiptRefNum: "参照番号:", receiptDate: "日付:", receiptTime: "時間:", receiptFrom: "送信元:", receiptTo: "宛先:", successMsg: (user, amt, name) => `${name}への$${amt}の転送が成功しました!`, insufficientBalance: "残高不足", insufficientMsg: "このトランザクションを完了するのに十分な残高がありません。", help: "GTBヘルプセンター", destNames: {} },
+        da: { head: "GLOBAL TILLIDS BANK", login: "Log Ind", user: "Brugernavn", pass: "Adgangskode PIN", auth: "Sikker Login", welcome: "Velkommen", transfer: "Overfør", save: "Indbetaling", cash: "Udbetaling", exit: "Luk", history: "Aktivitetslog", beneficiary: "Modtagers Navn", accNum: "Kontonummer", bank: "Bank", amt: "Beløb ($)", initiate: "Overfør Nu", verifying: "Verificerer dine legitimationsoplysninger...", confirm: "Bekræft beløb", selectPlaceholder: "Vælg Destinationsland", advisory: "<b>Sikkerhedsmeddelelse</b> Del aldrig din PIN med nogen. Global Trust Bank vil aldrig bede om din PIN eller kontooplysninger via besked eller opkald.", receiptTitle: "OVERFØRSELSKVITTERING", receiptSuccess: "OVERFØRSEL VELLYKKET", receiptRefNum: "Referencenummer:", receiptDate: "Dato:", receiptTime: "Tid:", receiptFrom: "Fra:", receiptTo: "Til:", successMsg: (user, amt, name) => `Overførsel på $${amt} til ${name} vellykket!`, insufficientBalance: "Utilstrækkelig Balance", insufficientMsg: "Du har ikke tilstrækkelig balance til at gennemføre denne overførsel.", help: "GTB Hjælpecenter", destNames: {} },
+        pl: { head: "GLOBALNY BANK ZAUFANIA", login: "Zaloguj Się", user: "Nazwa użytkownika", pass: "PIN dostępu", auth: "Bezpieczne Logowanie", welcome: "Witaj", transfer: "Przelew", save: "Wpłata", cash: "Wypłata", exit: "Wyjdź", history: "Dziennik Aktywności", beneficiary: "Nazwa Beneficjenta", accNum: "Numer Konta", bank: "Bank", amt: "Kwota ($)", initiate: "Prześlij Teraz", verifying: "Weryfikowanie Twoich danych...", confirm: "Potwierdź kwotę", selectPlaceholder: "Wybierz Kraj Docelowy", advisory: "<b>Powiadomienie o Bezpieczeństwie</b> Nigdy nie udostępniaj swojego PIN-u nikomu. Global Trust Bank nie prosi o PIN ani dane konta przez wiadomości lub połączenia telefoniczne.", receiptTitle: "POTWIERDZENIE PRZELEWU", receiptSuccess: "PRZESŁANIE POMYŚLNE", receiptRefNum: "Numer Referencyjny:", receiptDate: "Data:", receiptTime: "Godzina:", receiptFrom: "Od:", receiptTo: "Do:", successMsg: (user, amt, name) => `Przesłanie $${amt} do ${name} powiodło się!`, insufficientBalance: "Niewystarczające Saldo", insufficientMsg: "Nie posiadasz wystarczającego salda, aby ukończyć ten przesył.", help: "Centrum Pomocy GTB", destNames: {} },
+        no: { head: "GLOBAL TRUST BANK", login: "Logg Inn", user: "Brukernavn", pass: "Tilgangs-PIN", auth: "Sikker Innlogging", welcome: "Velkommen", transfer: "Overføring", save: "Innskudd", cash: "Uttak", exit: "Avslutt", history: "Aktivitetslogg", beneficiary: "Mottakers Navn", accNum: "Kontonummer", bank: "Bank", amt: "Beløp ($)", initiate: "Overfør Nå", verifying: "Verifiserer dine legitimasjonsopplysninger...", confirm: "Bekreft beløp", selectPlaceholder: "Velg Destinasjonsland", advisory: "<b>Sikkerhetsvarsel</b> Del aldri PIN-koden din med noen. Global Trust Bank vil aldri be om PIN eller kontodetaljer via melding eller telefonsamtale.", receiptTitle: "OVERFØRINGSKVITTERING", receiptSuccess: "OVERFØRING VELLYKKET", receiptRefNum: "Referansenummer:", receiptDate: "Dato:", receiptTime: "Tid:", receiptFrom: "Fra:", receiptTo: "Til:", successMsg: (user, amt, name) => `Overføring av $${amt} til ${name} vellykket!`, insufficientBalance: "Utilstrekkelig saldo", insufficientMsg: "Du har ikke tilstrekkelig saldo til å gjennomføre denne overføringen.", help: "GTB Hjelpesenter", destNames: {} },
+        fil: { head: "PANDAIGDIGANG BANGKO NG TIWALA", login: "Mag-Log In", user: "Pangalan ng Gumagamit", pass: "Access PIN", auth: "Secure na Pag-Login", welcome: "Maligayang Pagdating", transfer: "Magpadala", save: "I-deposito", cash: "Mag-withdraw", exit: "Lumabas", history: "Activity Log", beneficiary: "Pangalan ng Benepisyaryo", accNum: "Account Number", bank: "Bank", amt: "Halaga ($)", initiate: "Magpadala Ngayon", verifying: "Veri-verify ang iyong kredensyal...", confirm: "Kumpirmahin ang halaga", selectPlaceholder: "Piliin ang Bansang Destinasyon", advisory: "<b>Security Notice</b> Huwag ibahagi ang inyong PIN sa sinuman. Hindi kailanman hihilingin ng Global Trust Bank ang iyong PIN o detalye ng account sa pamamagitan ng mensahe o tawag.", receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:", successMsg: (user, amt, name) => `Matagumpay na padala ng $${amt} sa ${name}!`, insufficientBalance: "Walang Sapat na Balanse", insufficientMsg: "Ninyo ay walang sapat na balanse upang makumpleto ang paglilipat na ito.", help: "GTB Help Center", destNames: {} },
+        tr: { head: "KÜRESEL GÜVENİŞ BANKASI", login: "Giriş Yap", user: "Kullanıcı Adı", pass: "Erişim PIN'i", auth: "Güvenli Giriş", welcome: "Hoş Geldiniz", transfer: "Transfer", save: "Yatırım", cash: "Para Çekme", exit: "Çıkış", history: "Aktivite Günlüğü", beneficiary: "Yararlanıcı Adı", accNum: "Hesap Numarası", bank: "Banka", amt: "Miktar ($)", initiate: "Şimdi Transfer Et", verifying: "Kimlik bilgileriniz kontrol ediliyor...", confirm: "Tutarı onaylayın", selectPlaceholder: "Hedef Ülkeyi Seçin", advisory: "<b>Güvenlik Bildirimi</b> PIN'inizi kimseyle paylaşmayın. Global Trust Bank asla PIN veya hesap detaylarınızı mesaj veya arama yoluyla istemez.", receiptTitle: "TRANSFER MAKBUZU", receiptSuccess: "TRANSFER BAŞARILI", receiptRefNum: "Referans Numarası:", receiptDate: "Tarih:", receiptTime: "Saat:", receiptFrom: "Gönderen:", receiptTo: "Alıcı:", successMsg: (user, amt, name) => `${name}'e $${amt} transferi başarılı!`, insufficientBalance: "Yetersiz Bakiye", insufficientMsg: "Bu transferi tamamlamak için yeterli bakiyeniz yok.", help: "GTB Yardım Merkezi", destNames: {} },
+        tet: { head: "BANKU MUNDIÁL HUSI KONFIANSA", login: "Log In", user: "Naran Utilizador", pass: "PIN Asesu", auth: "Asesu Seguru", welcome: "Bem-Vindo", transfer: "Transferênsia", save: "Depósito", cash: "Retira", exit: "Sai", history: "Aktividade Log", beneficiary: "Naran Benefisiáriu", accNum: "Numru Konta", bank: "Banku", amt: "Valor ($)", initiate: "Transferênsia Agora", verifying: "Verifika kredensial...", confirm: "Konfirma valor", selectPlaceholder: "Hili Pajís Destinasaun", advisory: "<b>Avizu Seguransa</b> Lori nunka share PIN ho nian. Global Trust Bank lori nunka husu PIN ka detallu konta liu mensajen ka ligasaun.", receiptTitle: "RECEBIMENTA TRANSFERÊNSIA", receiptSuccess: "TRANSFERÊNSIA SUKSESU", receiptRefNum: "Numru Referênsia:", receiptDate: "Data:", receiptTime: "Tempu:", receiptFrom: "Hosi:", receiptTo: "Ba:", successMsg: (user, amt, name) => `Transferênsia $${amt} ba ${name} suksesu!`, insufficientBalance: "Balansa Karik", insufficientMsg: "Balansa ita-nia la sai liu tan ba halo transferênsia ne'e.", help: "Ajuda Sentru GTB", destNames: {} },
+        vi: { head: "NGÂN HÀNG TIN TƯỞNG TOÀN CẦU", login: "Đăng Nhập", user: "Tên người dùng", pass: "Mã PIN", auth: "Đăng Nhập An Toàn", welcome: "Chào Mừng", transfer: "Chuyển tiền", save: "Gửi tiền", cash: "Rút tiền", exit: "Thoát", history: "Nhật Ký Hoạt Động", beneficiary: "Tên Người Thụ Hưởng", accNum: "Số Tài Khoản", bank: "Ngân Hàng", amt: "Số Tiền ($)", initiate: "Chuyển Ngay", verifying: "Đang xác minh thông tin của bạn...", confirm: "Xác nhận số tiền", selectPlaceholder: "Chọn Quốc Gia Đích", advisory: "<b>Thông Báo Bảo Mật</b> Không bao giờ chia sẻ PIN của bạn với bất cứ ai. Global Trust Bank sẽ không bao giờ yêu cầu PIN hoặc thông tin tài khoản qua tin nhắn hoặc cuộc gọi.", receiptTitle: "BIÊN LAI CHUYỂN TIỀN", receiptSuccess: "CHUYỂN TIỀN THÀNH CÔNG", receiptRefNum: "Số Tham Chiếu:", receiptDate: "Ngày:", receiptTime: "Thời Gian:", receiptFrom: "Từ:", receiptTo: "Đến:", successMsg: (user, amt, name) => `Chuyển $${amt} cho ${name} thành công!`, insufficientBalance: "Số Dư Không Đủ", insufficientMsg: "Bạn không có đủ số dư để hoàn thành chuyển tiền này.", help: "Trung Tâm Trợ Giúp GTB", destNames: {} },
+        gb: { head: "GLOBAL TRUST BANK", login: "Sign In", user: "Username", pass: "Access PIN", auth: "Secure Login", welcome: "Welcome", transfer: "Transfer", save: "Deposit", cash: "Withdraw", exit: "Exit", history: "Activity Log", beneficiary: "Beneficiary Name", accNum: "Account Number", bank: "Bank", amt: "Amount ($)", initiate: "Transfer Now", verifying: "Verifying your credentials...", confirm: "Confirm amount", selectPlaceholder: "Select Destination Country", advisory: "<b>Security Notice</b> Never share your PIN with anyone. Global Trust Bank will never ask for your PIN or account details through any message or call.", receiptTitle: "TRANSFER RECEIPT", receiptSuccess: "TRANSFER SUCCESSFUL", receiptRefNum: "Reference Number:", receiptDate: "Date:", receiptTime: "Time:", receiptFrom: "From:", receiptTo: "To:", successMsg: (user, amt, name) => `Transfer of $${amt} to ${name} successful!`, insufficientBalance: "Insufficient Balance", insufficientMsg: "You do not have enough balance to complete this transfer.", help: "GTB Help Center", destNames: {} }
     };
     
     function getTranslationDictionary(countryCode) {
         if (langData[countryCode]) return langData[countryCode];
-        const customRoutingMatrix = { 
-            es: 'es', ar: 'ar', pt: 'pt', fr: 'fr', de: 'de', it: 'it', ja: 'ja', 
-            pl: 'pl', da: 'da', tr: 'tr', vi: 'vi', fil: 'fil', tet: 'tet', no: 'no', en: 'en', id: 'id', ms: 'ms', th: 'th', gb: 'gb'
-        };
+        const customRoutingMatrix = { es: 'es', ar: 'ar', pt: 'pt', fr: 'fr', de: 'de', it: 'it', ja: 'ja', pl: 'pl', da: 'da', tr: 'tr', vi: 'vi', fil: 'fil', tet: 'tet', no: 'no', en: 'en', id: 'id', ms: 'ms', th: 'th', gb: 'gb' };
         return langData[customRoutingMatrix[countryCode]] || langData['en'];
     }
 
     function getConnector(countryCode) {
-        const map = {
-            en: 'to', id: 'ke', ms: 'ke', pt: 'para', es: 'a', fr: 'à', de: 'zu', it: 'a', ja: 'へ', ar: 'إلى', vi: 'đến', th: 'ถึง', fil: 'sa', pl: 'do', da: 'til', tr: 'ye', tet: 'ba',
-            gb: 'to'
-        };
+        const map = { en: 'to', id: 'ke', ms: 'ke', pt: 'para', es: 'a', fr: 'à', de: 'zu', it: 'a', ja: 'へ', ar: 'إلى', vi: 'đến', th: 'ถึง', fil: 'sa', pl: 'do', da: 'til', tr: 'ye', tet: 'ba', gb: 'to' };
         return map[countryCode] || 'to';
     }
 
@@ -467,13 +270,10 @@
         const d = getTranslationDictionary(c);
         const tSelector = document.getElementById("transferCountry");
         const placeholder = document.getElementById("selectPlaceholder");
-        
         placeholder.innerText = d.selectPlaceholder;
-        
         while (tSelector.options.length > 1) {
             tSelector.remove(1);
         }
-        
         countryDropdownOptions.forEach(opt => {
             const el = document.createElement("option");
             const translatedName = d.destNames[opt.name] || opt.name;
@@ -516,7 +316,7 @@
             setTimeout(() => {
                 removeLoadingOverlay();
                 const splash = document.createElement("div");
-                splash.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000;";
+                splash.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:998;";
                 const connector = getConnector(selectedCountry);
                 splash.innerHTML = `
                     <img src="File_000000009678724680189a55ffec1a9b.png" style="width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:20px;" alt="Bank Logo">
@@ -575,22 +375,11 @@
     function getFormattedDateTimeInTimezone(dateObj, countryCode) {
         const timezone = countryTimezones[countryCode] || 'UTC';
         const formatter = new Intl.DateTimeFormat('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true,
-            timeZone: timezone
+            year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: timezone
         });
-        
         const parts = formatter.formatToParts(dateObj);
         const partMap = {};
-        parts.forEach(part => {
-            partMap[part.type] = part.value;
-        });
-        
+        parts.forEach(part => { partMap[part.type] = part.value; });
         return `${partMap.month}/${partMap.day}/${partMap.year} ${partMap.hour}:${partMap.minute} ${partMap.dayperiod}`;
     }
 
@@ -601,13 +390,12 @@
         const d1 = new Date(2020, 5, 7);
         const d2 = new Date(2020, 5, 5);
         const d3 = new Date(2020, 5, 3);
-        const d4 = new Date(2020, 5, 1);
         const regionalHistory = {
-            en: [{n:"St. Jude Research", a:250000, d:getFormattedDate(d1)}, {n:"Red Cross Relief", a:150000, d:getFormattedDate(d2)}, {n:"UNICEF Foundation", a:100000, d:getFormattedDate(d3)}, {n:"World Vision", a:50000, d:getFormattedDate(d4)}],
-            id: [{n:"RS Pusat Bandung", a:250000, d:getFormattedDate(d1)}, {n:"Masjid Raya Dago", a:150000, d:getFormattedDate(d2)}, {n:"Panti Asuhan Jabar", a:100000, d:getFormattedDate(d3)}, {n:"Yayasan Peduli", a:50000, d:getFormattedDate(d4)}],
-            ms: [{n:"Mercy Malaysia", a:250000, d:getFormattedDate(d1)}, {n:"Aman Palestine", a:150000, d:getFormattedDate(d2)}, {n:"Rumah Anak Yatim", a:100000, d:getFormattedDate(d3)}, {n:"Bantuan Masyarakat", a:50000, d:getFormattedDate(d4)}],
-            pt: [{n:"AACD Reabilitação", a:250000, d:getFormattedDate(d1)}, {n:"Saúde Criança", a:150000, d:getFormattedDate(d2)}, {n:"Gerando Falcões", a:100000, d:getFormattedDate(d3)}, {n:"Ação Social", a:50000, d:getFormattedDate(d4)}],
-            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:getFormattedDate(d1)}, {n:"มูลนิธิกระจกเงา", a:150000, d:getFormattedDate(d2)}, {n:"ศูนย์เด็กยากไร้", a:100000, d:getFormattedDate(d3)}, {n:"การกุศล", a:50000, d:getFormattedDate(d4)}]
+            en: [{n:"St. Jude Research", a:250000, d:getFormattedDate(d1)}, {n:"Red Cross Relief", a:150000, d:getFormattedDate(d2)}, {n:"UNICEF Foundation", a:100000, d:getFormattedDate(d3)}],
+            id: [{n:"RS Pusat Bandung", a:250000, d:getFormattedDate(d1)}, {n:"Masjid Raya Dago", a:150000, d:getFormattedDate(d2)}, {n:"Panti Asuhan Jabar", a:100000, d:getFormattedDate(d3)}],
+            ms: [{n:"Mercy Malaysia", a:250000, d:getFormattedDate(d1)}, {n:"Aman Palestine", a:150000, d:getFormattedDate(d2)}, {n:"Rumah Anak Yatim", a:100000, d:getFormattedDate(d3)}],
+            pt: [{n:"AACD Reabilitação", a:250000, d:getFormattedDate(d1)}, {n:"Saúde Criança", a:150000, d:getFormattedDate(d2)}, {n:"Gerando Falcões", a:100000, d:getFormattedDate(d3)}],
+            th: [{n:"โรงพยาบาลศิริราช", a:250000, d:getFormattedDate(d1)}, {n:"มูลนิธิกระจกเงา", a:150000, d:getFormattedDate(d2)}, {n:"มูลนิธิเด็กไทย", a:100000, d:getFormattedDate(d3)}]
         };
         const currentActiveLang = ['id','ms','pt','th'].includes(c) ? c : 'en';
         (regionalHistory[currentActiveLang] || regionalHistory['en']).forEach(item => {
@@ -630,17 +418,8 @@
         const country = document.getElementById("transferCountry").value;
         const a_val = document.getElementById("amount").value;
         const a_numeric = parseFloat(a_val.replace(/,/g, ''));
-        
-        if(!r || !country || isNaN(a_numeric)) { 
-            alert("Check details"); 
-            return; 
-        }
-        
-        if(a_numeric > balance) {
-            showNotification(d.insufficientBalance + "\n\n" + d.insufficientMsg);
-            return;
-        }
-        
+        if(!r || !country || isNaN(a_numeric)) { alert("Check details"); return; }
+        if(a_numeric > balance) { showNotification(d.insufficientBalance + "\n\n" + d.insufficientMsg); return; }
         document.getElementById("transferPreview").innerHTML = `
             <div class="card" style="margin-top:10px; background:#f8fafc">
                 <small>${d.confirm}: $${a_numeric.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</small>
@@ -653,13 +432,8 @@
     function finishTransfer(amt, name, country) {
         const c = selectedLanguageCode;
         const d = getTranslationDictionary(c);
-        if(document.getElementById("tPin").value !== transferPin) { 
-            alert("Invalid PIN"); 
-            return; 
-        }
-        
+        if(document.getElementById("tPin").value !== transferPin) { alert("Invalid PIN"); return; }
         showLoadingOverlay(d.processing);
-        
         setTimeout(() => {
             removeLoadingOverlay();
             balance -= amt;
@@ -669,9 +443,7 @@
             li.innerHTML = `<div><small style="color:#94a3b8">${getFormattedDate(now)}</small><br><strong>${name}</strong></div><span style="color:#e11d48">-$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
             document.getElementById("history").prepend(li);
             document.getElementById("transferBox").classList.add("hidden");
-            
             showNotification(d.successMsg(loggedInUser, amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}), name));
-            
             generateRealReceipt(name, amt, now, country);
         }, 3000); 
     }
@@ -685,7 +457,7 @@
         const receiptDate = receiptDateTime.split(' ').slice(0, 1).join(' ');
         const receiptTime = receiptDateTime.split(' ').slice(1).join(' ');
         rBox.classList.remove("hidden");
-        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:45px; margin-bottom:8px; border-radius:50%; object-fit:cover;"><div style="font-size:18px; font-weight:700; color:#0f172a;">${d.receiptTitle}</div><div class="success-badge">${d.receiptSuccess}</div></div><div class="receipt-body"><div class="receipt-row"><span>${d.receiptRefNum}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.receiptDate}</span><b>${receiptDate}</b></div><div class="receipt-row"><span>${d.receiptTime}</span><b>${receiptTime}</b></div><div class="receipt-row"><span>${d.receiptFrom}</span><b>${loggedInUser}</b></div><div class="receipt-row"><span>${d.receiptTo}</span><b>${name}</b></div><div class="receipt-row"><span>Country</span><b>${country}</b></div><div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></div></div><div class="receipt-footer">Global Trust Bank • Secure Electronic Transfer • This receipt is generated for record keeping only.</div></div>`;
+        rBox.innerHTML = `<div class="receipt-container"><div class="receipt-header"><img src="File_000000009678724680189a55ffec1a9b.png" style="width:45px; margin-bottom:8px; border-radius:50%; object-fit:cover;"><div style="font-size:12px; font-weight:700; letter-spacing:1px;">${d.receiptTitle}</div><div class="success-badge" style="margin-top:10px;">${d.receiptSuccess}</div></div><div class="receipt-body"><div class="receipt-row"><span>${d.receiptRefNum}</span><b>${refNum}</b></div><div class="receipt-row"><span>${d.receiptDate}</span><b>${receiptDate}</b></div><div class="receipt-row"><span>${d.receiptTime}</span><b>${receiptTime}</b></div><div class="receipt-row"><span>${d.receiptFrom}</span><b>${loggedInUser || 'Valued Client'}</b></div><div class="receipt-row"><span>${d.receiptTo}</span><b>${name}</b></div><div class="receipt-row"><span>Country</span><b>${country}</b></div><div class="receipt-row"><span>Amount</span><b>$${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b></div></div><div class="receipt-footer">Global Trust Bank © 2025 • Customer support is available through Telegram at @globaltrustbankcustomercare</div></div>`;
     }
 
     function toggleBalance() {
