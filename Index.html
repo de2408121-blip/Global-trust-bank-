@@ -321,14 +321,14 @@
                 splash.innerHTML = `
                     <img src="File_000000009678724680189a55ffec1a9b.png" style="width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:20px;" alt="Bank Logo">
                     <p style="font-size:18px; color:#94a3b8; margin:0;">${d.head}</p>
-                    <p style="font-size:24px; font-weight:600; color:#1e293b; margin-top:18px;">Welcome ${loggedInUser} to Rodrigo's Charity Account</p>
+                    <p style="font-size:24px; font-weight:600; color:#1e293b; margin-top:18px;">Welcome ${loggedInUser} to RGO Charity Account</p>
                 `;
                 document.body.appendChild(splash);
                 setTimeout(() => {
                     splash.remove();
                     document.getElementById("login").classList.add("hidden");
                     document.getElementById("dashboard").classList.remove("hidden");
-                    document.getElementById("welcomeText").innerText = `Welcome ${loggedInUser} to Rodrigo's Charity Account`;
+                    document.getElementById("welcomeText").innerText = `Welcome ${loggedInUser} to RGO Charity Account`;
                     document.getElementById("balance").innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     applyDashboardLang();
                     loadHistory();
